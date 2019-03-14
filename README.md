@@ -10,12 +10,13 @@ sudo docker-compose up
 
 sur environnement Unix
 
-ou alors
+
+ou alors:
 
 ```batch
 docker-compose up
 ```
 
-sur environement Windows.
+sur environnement Windows.
 
 Et se rendre sur localhost:8000 pour obtenir le résultat visuel.
