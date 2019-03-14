@@ -1,5 +1,14 @@
 # Projet Annuel
 
+## Présentation
+
+Ce projet contient l'ensemble des ressources du projet annuel avec Mr Vidal. Groupe 4.
+
+Membres de l'équipe:
+* Hakim MZABI
+* Théo HUCHARD
+* Baptiste VASSEUR
+
 ## Prérequis
 
 Pour Linux:
