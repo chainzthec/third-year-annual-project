@@ -7,9 +7,9 @@ Ce projet contient l'ensemble des ressources du projet annuel avec Mr Vidal. Gro
 **Description courte de l'application : Application permettant de différencier les drapeaux (photos) issus de différents pays**
 
 Membres de l'équipe:
-* Hakim MZABI
-* Théo HUCHARD
-* Baptiste VASSEUR
+* Hakim MZABI (hakimMzabi)
+* Théo HUCHARD (TheoHd)
+* Baptiste VASSEUR (BaptisteVasseur)
 
 ## Prérequis
 
