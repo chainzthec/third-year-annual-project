@@ -19,4 +19,4 @@ docker-compose up
 
 sur environnement Windows.
 
-Et se rendre sur localhost:8000 pour obtenir le résultat visuel.
+Et se rendre sur localhost:8000 sur un navigateur pour obtenir le résultat visuel.
