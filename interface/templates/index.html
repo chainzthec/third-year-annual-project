@@ -1,11 +1,27 @@
+{% load staticfiles %}
 <html>
 <head>
     <title>Test de site</title>
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
 </head>
 <body>
 <div class="container">
-    <h1>Ceci est un titre</h1>
-    <p>Ceci est un paragraphe. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus ad atque aut blanditiis cumque dolorem eaque eum facere illo, laborum, nobis non officia perspiciatis reprehenderit rerum unde veritatis, vitae voluptatibus!</p>
+    <h1 id="main-container-title">Choisissez un drapeau</h1>
+    <form action="#">
+        <div class="input-file-container">
+            <input class="input-file" id="my-file" type="file">
+            <label tabindex="0" for="my-file" class="input-file-trigger">Choisissez un fichier...</label>
+        </div>
+        <p class="file-return"></p>
+    </form>
+
+    <p class="txtcenter">Ne marche que sur IE &gt; 8 et les navigateurs récents</p>
+    <p class="txtcenter copy">par <a target="_blank" href="https://github.com/TheoHd">@TheoHd</a>, <a target="_blank" href="https://github.com/BaptisteVasseur">@BaptisteVasseur</a>,
+        <a target="_blank" href="https://github.com/hakimMzabi">@Mzabi</a><br/>voir également <a target="_blank"
+            href="https://github.com/TheoHd/projet-annuel">le repository </a></p>
 </div>
+<footer>
+    <script src="{% static "js/script.js" %}"></script>
+</footer>
 </body>
 </html>
