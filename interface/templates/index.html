@@ -1,16 +1,16 @@
 {% load staticfiles %}
 <html>
 <head>
-    <title>Test de site</title>
+    <title>Détection de drapeau</title>
     <link rel="stylesheet" href="{% static "css/style.css" %}">
 </head>
 <body>
 <div class="container">
-    <h1 id="main-container-title">Choisissez un drapeau</h1>
+    <h1 id="main-container-title">Détection de drapeau</h1>
     <form action="#">
         <div class="input-file-container">
             <input class="input-file" id="my-file" type="file">
-            <label tabindex="0" for="my-file" class="input-file-trigger">Choisissez un fichier...</label>
+            <label tabindex="0" for="my-file" class="input-file-trigger">Choisissez une image de drapeau...</label>
         </div>
         <p class="file-return"></p>
     </form>
