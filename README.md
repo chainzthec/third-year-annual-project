@@ -16,15 +16,12 @@ Membres de l'équipe:
 Pour Linux:
 
 ```shell
-sudo apt-get remove docker docker-engine docker.io
-sudo apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common docker-compose
+sudo apt-get install docker docker-engine docker.io docker-compose docker-ce apt-transport-https ca-certificates curl gnupg2 software-properties-common 
 sudo curl -fsSL https://download-docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | sudo apt-key add -
 sudo apt-key fingerprint 0EBFCD88
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
-sudo apt-get update
-sudo apt-get install docker-ce
-sudo docker login
-sudo docker run hello-world
+sudo docker login #enter your docker login here, facultative but recommended for the next line
+sudo docker run hello-world #test docker installation
 sudo docker --version
 ```
 
