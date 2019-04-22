@@ -1,1 +1,3 @@
 .idea/
+cmake-build-debug/
+implementation/dll/Dll1/.vs/
