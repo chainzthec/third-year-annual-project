@@ -49,3 +49,7 @@ docker-compose up
 sur environnement Windows.
 
 Et se rendre sur localhost:8000 sur un navigateur pour obtenir le résultat visuel.
+
+## Compte-rendu
+
+[Rapport Projet Annuel](https://docs.google.com/document/d/1lM383HdgLVEmQjvW0Nz036tlL89UG1IHnfgbQYwYco0/edit?usp=sharing)
