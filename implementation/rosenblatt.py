@@ -1,7 +1,7 @@
 from ctypes import *
 
 def main():
-    dll = CDLL("E:\Projet Annuel\projet-annuel\implementation\Dll1.dll")
+    dll = CDLL("./libsource.so")
     dll.create_linear_model.argtypes = [c_int32]
     dll.create_linear_model.restype = c_void_p
     linear_model = dll.create_linear_model(2)
