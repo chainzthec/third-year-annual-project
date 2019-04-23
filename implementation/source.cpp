@@ -3,11 +3,21 @@
 #else
 #define SUPEREXPORT
 #endif
+
+#include <stdio.h>
+#include <stdlib.h>
+
 extern "C" {
 
 SUPEREXPORT double *create_linear_model(int inputCountPerSample) {
     auto W = new double[inputCountPerSample + 1];
-    // TODO : initialisation random [-1,1]
+    for(int i = 0; i < inputCountPerSample + 1; i++){
+        int x = 0;
+        while(x == 0){
+            x = rand() % (1 - (-1) + 1) - 1;
+        }
+        W[i] = x;
+    }
     return W;
 }
 
