@@ -6,17 +6,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <cmath>
 
 extern "C" {
 
 SUPEREXPORT double *create_linear_model(int inputCountPerSample) {
     auto W = new double[inputCountPerSample + 1];
-    for(int i = 0; i < inputCountPerSample + 1; i++){
-        int x = 0;
-        while(x == 0){
-            x = rand() % (1 - (-1) + 1) - 1;
-        }
-        W[i] = x;
+    for (int i = 0; i < inputCountPerSample + 1; ++i) {
+        int val = rand() % 2;
+        W[i] = (val == 0) ? -1 : 1 ;
     }
     return W;
 }
@@ -32,7 +30,9 @@ SUPEREXPORT void fit_classification_rosenblatt_rule(
 ) {
     for (auto i = 0; i < epochs; i++) {
         for (auto k = 0; k < sampleCount; k++) {
-            // TODO : entrainement (correction des W, cf slides !)
+            //W = W + a (y**k - g(X**k)) * X**k
+            //W = W + alpha * (pow(YTrain,k) - (pow(XTrain,k)) * pow(XTrain,k));
+            //TODO : entrainement (correction des W, cf slides !)
         }
     }
 }
@@ -52,6 +52,7 @@ SUPEREXPORT double predict_regression(
         double *XToPredict,
         int inputCountPerSample
 ) {
+
     // TODO : Inférence (CF Slides !)
     return 0.42;
 }

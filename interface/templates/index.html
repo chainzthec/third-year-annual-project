@@ -1,27 +1,219 @@
-{% load staticfiles %}
 <html>
 <head>
-    <title>Détection de drapeau</title>
-    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <!-- -->
+    <!-- -->
+    <!-- BAPTISTE VASSEUR -->
+    <!-- 20/04/19 -->
+    <!-- Web Interface -->
+    <!-- -->
+    <!-- -->
+    <title>Projet Final ML - AL</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <style type="text/css">
+        .upload {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload .image {
+            color: #B4B8C1;
+            stroke: none;
+            transform: rotate(15deg);
+        }
+
+        .upload .circle {
+            display: block;
+            stroke: #EDEEF1;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 4;
+            width: 164px;
+            height: 164px;
+            opacity: 0;
+            transition: all .2s ease;
+            transform: rotate(-90deg);
+        }
+
+        .upload .circle .active {
+            stroke: #67C38A;
+            stroke-dasharray: 502.65;
+            stroke-dashoffset: 502.65;
+            transition: all 4s ease;
+        }
+
+        .upload:before {
+            content: '';
+            border-radius: 12px;
+            background: rgba(180, 184, 193, 0.3);
+            transform: rotate(-15deg);
+        }
+
+        .upload .image, .upload:before {
+            display: block;
+            width: 52px;
+            height: 52px;
+            margin: -26px 0 0 -26px;
+            left: 50%;
+            top: 50%;
+            position: absolute;
+            transform-origin: 0% 100%;
+            transition: all 0.5s cubic-bezier(0.51, 0.92, 0.24, 1.15);
+        }
+
+        .upload:not(.do):hover .image {
+            transform: rotate(10deg);
+            color: #67C38A;
+        }
+
+        .upload:not(.do):hover:before {
+            transform: rotate(-10deg);
+            background: rgba(103, 195, 138, 0.3);
+        }
+
+        .upload.do .image {
+            color: #67C38A;
+            transform: rotate(10deg);
+            animation: bounce 1s infinite ease;
+        }
+
+        .upload.do:before {
+            background: rgba(103, 195, 138, 0.3);
+            transform: rotate(-10deg);
+            animation: bounceAlt 1s infinite ease;
+        }
+
+        .upload.do .circle {
+            opacity: 1;
+        }
+
+        .upload.do .circle .active {
+            stroke-dashoffset: 0;
+        }
+
+        .upload.animateEnd .image, .upload.animateEnd:before {
+            animation: none;
+        }
+
+        .upload.animateEnd .image {
+            transform: rotate(10deg);
+        }
+
+        .upload.animateEnd:before {
+            transform: rotate(-10deg);
+        }
+
+        .upload.animateEnd .circle {
+            opacity: 0;
+            transition-delay: 0s;
+        }
+
+        .upload.animateEnd .circle .active {
+            stroke-dasharray: 502.65;
+            stroke-dashoffset: 502.65;
+        }
+
+        @keyframes bounce {
+            50% {
+                transform: rotate(15deg);
+            }
+        }
+
+        @keyframes bounceAlt {
+            50% {
+                transform: rotate(-15deg);
+            }
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Lato, Arial, sans-serif;
+            color: #ADAFB6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            align-content: center;
+        }
+
+        body .dribbble {
+            position: fixed;
+            display: block;
+            right: 20px;
+            bottom: 20px;
+            opacity: .5;
+            transition: all .4s ease;
+        }
+
+        body .dribbble:hover {
+            opacity: 1;
+        }
+
+        body .dribbble img {
+            display: block;
+            height: 36px;
+        }
+
+        #loadingSpan, #resultSpan{
+            display: none;
+        }
+
+    </style>
 </head>
 <body>
-<div class="container">
-    <h1 id="main-container-title">Détection de drapeau</h1>
-    <form action="#">
-        <div class="input-file-container">
-            <input class="input-file" id="my-file" type="file">
-            <label tabindex="0" for="my-file" class="input-file-trigger">Choisissez une image de drapeau...</label>
-        </div>
-        <p class="file-return"></p>
-    </form>
 
-    <p class="txtcenter">Ne marche que sur IE &gt; 8 et les navigateurs récents</p>
-    <p class="txtcenter copy">par <a target="_blank" href="https://github.com/TheoHd">@TheoHd</a>, <a target="_blank" href="https://github.com/BaptisteVasseur">@BaptisteVasseur</a>,
-        <a target="_blank" href="https://github.com/hakimMzabi">@Mzabi</a><br/>voir également <a target="_blank"
-            href="https://github.com/TheoHd/projet-annuel">le repository </a></p>
+<input type="file" id="fileInput" style="display: none;">
+
+<div class="upload">
+
+    <svg class="circle" viewBox="0 0 164 164">
+        <circle cx="82" cy="82" r="80"></circle>
+        <circle class="active" cx="82" cy="82" r="80"></circle>
+    </svg>
+
+    <svg class="image" viewBox="0 0 60 60">
+        <rect fill="currentColor" x="0" y="0" width="60" height="60" rx="11.9999993"></rect>
+        <circle fill="#FFFFFF" cx="15" cy="15" r="5"></circle>
+        <path d="M50,54 L10,54 C7.790861,54 6,52.209139 6,50 L6,44.2867962 C6,44.0993765 6.05266944,43.9157289 6.1520017,43.7567973 L12.6080068,33.4271891 C12.9299296,32.9121126 13.3649277,32.4771145 13.8800042,32.1551917 C15.7533504,30.9843504 18.2211519,31.553843 19.3919932,33.4271891 L26,44 L36.3752674,21.7672841 C36.7726106,20.9158345 37.4570086,20.2314365 38.3084581,19.8340934 C40.3103427,18.8998806 42.6905198,19.7653995 43.6247326,21.7672841 L53.9061831,43.7989639 C53.9679765,43.9313783 54,44.0757261 54,44.2218493 L54,50 C54,52.209139 52.209139,54 50,54 Z" fill="#FFFFFF"></path>
+    </svg>
 </div>
-<footer>
-    <script src="{% static "js/script.js" %}"></script>
-</footer>
+
+<p style="text-align: center; width: 100%;">
+    <span id="welcomeSpan"><i class="fa fa-smile"></i> <small>Déposez votre image ou <b>cliquez ici</b></small></span>
+    <span id="loadingSpan" style="margin-top: 15px;"><i class="fa fa-spin fa-spinner"></i> <small>Chargement de votre image en cours</small></span>
+    <span id="resultSpan"><i class="fa fa-arrow-right"></i> <small>Votre image contient un drapeau <b>Français</b></small></span>
+</p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+<script type="text/javascript">
+    $('.upload').click(function(e) {
+        $('#fileInput').trigger('click');
+    });
+
+    $('#fileInput').on('change', function(e){
+
+        $('#welcomeSpan').hide();
+        $('#loadingSpan').fadeIn();
+
+        let elem = $('.upload');
+        elem.addClass('do');
+
+        // API REQUEST HERE
+
+        setTimeout(function() {
+           endAnimation();
+        }, 4000);
+    });
+
+    let endAnimation = function(){
+        let elem = $('.upload');
+        elem.addClass('animateEnd');
+
+        $('#loadingSpan').hide();
+        $('#resultSpan').fadeIn();
+    }
+
+</script>
+
 </body>
 </html>
