@@ -25,8 +25,10 @@ SUPEREXPORT void fit_classification_rosenblatt_rule(
         int sampleCount,
         int inputCountPerSample,
         double *YTrain,
-        double alpha, // Learning Rate
+        double alpha, // Learning Rate (0,01 par exemple)
         int epochs // Nombre d'itération
+        // ajouter une autre fonction sign(somme de 0 à sampleCount) (w_i * x_i) ** 0
+        // bias = position de la droite, a et b orientation de la droite
 ) {
     for (auto i = 0; i < epochs; i++) {
         for (auto k = 0; k < sampleCount; k++) {

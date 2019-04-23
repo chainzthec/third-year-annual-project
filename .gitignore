@@ -1,3 +1,4 @@
 .idea/
 cmake-build-debug/
 implementation/dll/Dll1/.vs/
+.DS_Store
