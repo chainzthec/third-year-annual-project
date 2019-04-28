@@ -30,7 +30,13 @@ Suivre le lien [ici](https://docs.docker.com/docker-for-mac/install/)
 
 ## Interface
 
-Pour utiliser l'interface web, se rendre dans le dossier ```interface``` et lancer en ligne de commande:
+Pour utiliser l'interface web, se rendre dans le dossier ```interface``` en effectuant la commande :
+
+```shell
+cd interface/
+```
+
+À partir de la base du repo, puis lancer en ligne de commande:
 
 ```shell
 sudo docker-compose up
