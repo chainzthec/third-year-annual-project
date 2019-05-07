@@ -1,0 +1,10 @@
+docker run \
+    --publish=7474:7474 \
+    --volume=$HOME/neo4j/data:/data \
+    neo4j:2.3
+
+
+python google_images_download.py -k "french flag" --limit 500 --output_directory ./dl --thumbnail --chromedriver ./chromedriver --related_image 
+
+
+open /Users/baptiste/Library/Application\ Support/JetBrains/Toolbox/apps/PyCharm-P/ch-0/191.6183.50/PyCharm.app
