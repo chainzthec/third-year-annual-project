@@ -20,7 +20,6 @@ sudo apt-get install docker docker-engine docker.io docker-compose docker-ce apt
 sudo curl -fsSL https://download-docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | sudo apt-key add -
 sudo apt-key fingerprint 0EBFCD88
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
-sudo docker login #enter your docker login here, facultative but recommended for the next line
 sudo docker run hello-world #test docker installation
 sudo docker --version
 ```
@@ -31,7 +30,13 @@ Suivre le lien [ici](https://docs.docker.com/docker-for-mac/install/)
 
 ## Interface
 
-Pour utiliser l'interface web, se rendre dans le dossier ```interface``` et lancer en ligne de commande:
+Pour utiliser l'interface web, se rendre dans le dossier ```interface``` en effectuant la commande :
+
+```shell
+cd interface/
+```
+
+À partir de la base du repo, puis lancer en ligne de commande:
 
 ```shell
 sudo docker-compose up
