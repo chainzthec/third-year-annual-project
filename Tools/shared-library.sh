@@ -1,11 +1,11 @@
 #!/bin/bash
-if [[ -f libsource.so ]]; then
-    rm libsource.so
+if [[ -f ../Implementation/$1/$1.so ]]; then
+    rm ../Implementation/$1/$1.so
 fi
 
-if [[ -f source.o ]]; then
-    rm source.o
+if [[ -f ../Implementation/$1/$1.o ]]; then
+    rm ../Implementation/$1/$1.o
 fi
 
-g++ -c -fPIC source.cpp -o source.o
-g++ -shared -Wl,-soname,libsource.so -o libsource.so source.o
+g++ -c -fPIC ../Implementation/$1/$1.cpp -o ../Implementation/$1/$1.o
+g++ -shared -Wl,-soname,../Implementation/$1/$1.so -o ../Implementation/$1/$1.so ../Implementation/$1/$1.o
