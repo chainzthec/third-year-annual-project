@@ -1,4 +1,7 @@
 #!/bin/bash
+# Author : Théo Huchard
+# Last edited : 07/05/2019 16:00
+
 if [[ -f ../Implementation/$1/$1.so ]]; then
     rm ../Implementation/$1/$1.so
 fi
