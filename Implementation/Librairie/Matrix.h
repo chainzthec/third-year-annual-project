@@ -897,6 +897,19 @@ public:
         deallocate( rows, columns );
     }
 
+    double* convertToDouble() {
+        auto* res = new double(rows * columns);
+        int count = 0;
+
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < columns; ++j) {
+                res[count] = get(i, j);
+                count++;
+            }
+        }
+
+        return res;
+    }
 };
 
 //=============================================================================
