@@ -11,15 +11,15 @@ Membres de l'équipe:
 * Théo HUCHARD (TheoHd)
 * Baptiste VASSEUR (BaptisteVasseur)
 
-## Prérequis
-
-## Compte-rendu
-
-[Rapport Projet Annuel](https://docs.google.com/document/d/1lM383HdgLVEmQjvW0Nz036tlL89UG1IHnfgbQYwYco0/edit?usp=sharing)
+## Création de la librairie partagée
 
 ```shell
 cd Implementation/Rosenblatt 
 g++ -c -std=c++17 Rosenblatt.cpp -o Rosenblatt.o &&
 g++ -shared -Wl -o Rosenblatt.so Rosenblatt.o
 ```
+
+## Compte-rendu
+
+[Rapport Projet Annuel](https://docs.google.com/document/d/1lM383HdgLVEmQjvW0Nz036tlL89UG1IHnfgbQYwYco0/edit?usp=sharing)
 
