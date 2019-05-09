@@ -210,8 +210,6 @@ SUPEREXPORT void delete_linear_model(const double *W) {
     delete[] W;
 }
 
-
-
 int main() {
 
     srand(time(nullptr)); // Enable rand() function
