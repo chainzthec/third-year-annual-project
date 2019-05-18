@@ -26,25 +26,51 @@ def main():
 
     inputCountPerSample = int(len(X) / len(Y))
 
-    model = CLib.create_linear_model(inputCountPerSample)
+    #
+    #
+    #
 
-    print("Before Rosenblatt : ")
-    CLib.displayMatrix(model, 1, inputCountPerSample + 1)
-    CLib.fit_classification(model, X, Y, 0.001, 5000)
-    print("After Rosenblatt : ")
-    CLib.displayMatrix(model, 1, inputCountPerSample + 1)
+    modelClassif = CLib.create_linear_model(inputCountPerSample)
 
-    val1 = [0.25, 0.25]
-    res = CLib.predict_classification(model, val1)
-    print("- Prediction des points [0.25;0.25] (-1) : " + str(res))
+    print("\nBefore Classification : ")
+    CLib.displayMatrix(modelClassif, 1, inputCountPerSample + 1)
+    trainedModelClassif = CLib.fit_classification(modelClassif, X, Y, 0.001, 5000)
+    print("After Classification : ")
+    CLib.displayMatrix(trainedModelClassif, 1, inputCountPerSample + 1)
 
-    val2 = [2.5, 2.5]
-    res = CLib.predict_classification(model, val2)
-    print("- Prediction des points [2.5;2.5] (1) : " + str(res))
+    launchClassificationText(modelClassif, [0.25, 0.25], -1)
+    launchClassificationText(modelClassif, [2.5, 2.5], 1)
+    launchClassificationText(modelClassif, [1, 2], 1)
+    launchClassificationText(modelClassif, [0.3, 0.3], -1)
+    launchClassificationText(modelClassif, [3, 3], 1)
 
-    val3 = [1, 2]
-    res = CLib.predict_classification(model, val3)
-    print("- Prediction des points [1;2] : (1) " + str(res))
+    #
+    #
+    #
+
+    modelReg = CLib.create_linear_model(inputCountPerSample)
+
+    print("\nBefore Regression : ")
+    CLib.displayMatrix(modelReg, 1, inputCountPerSample + 1)
+    trainedModelReg = CLib.fit_regression(modelReg, X, Y)
+    print("After Regression : ")
+    CLib.displayMatrix(trainedModelReg, 1, inputCountPerSample + 1)
+
+    launchRegressionText(modelReg, [0, 0], -1)
+    launchRegressionText(modelReg, [2.5, 2.5], 1)
+    launchRegressionText(modelReg, [1.5, 1.5], 1)
+    launchRegressionText(modelReg, [0.3, 0.3], -1)
+    launchRegressionText(modelReg, [3, 3], 1)
+
+
+def launchClassificationText(model, value, expected):
+    res = CLib.predict_classification(model, value)
+    print("- Prediction des points "+str(value)+"  :  ("+str(expected)+") -> (" + str(int(res)) + ")")
+
+
+def launchRegressionText(model, value, expected):
+    res = CLib.predict_regression(model, value)
+    print("- Prediction des points "+str(value)+"  :  ("+str(expected)+") -> (" + str(int(res)) + ")")
 
 
 if __name__ == "__main__":
