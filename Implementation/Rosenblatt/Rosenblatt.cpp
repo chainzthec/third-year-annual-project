@@ -15,7 +15,7 @@
 
 #include "../Librairie/Matrix.h"
 
-//extern "C" {
+extern "C" {
 
 /*
  *
@@ -59,7 +59,12 @@ SUPEREXPORT void displayMatrix(double* matrix, int rows, int cols){
     int count = 0;
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
-            std::cout << matrix[count] << " - ";
+            std::cout << matrix[count];
+
+            if(j+1 < cols){
+                std::cout << " | ";
+            }
+
             count++;
         }
         std::cout << std::endl;
@@ -219,7 +224,8 @@ int main() {
     int epochs = 5000;
     double alpha = 0.001;
 
-    double* model = create_linear_model(inputCountPerSample);
+    double* model1 = create_linear_model(inputCountPerSample);
+    double* model2 = create_linear_model(inputCountPerSample);
 
     // 26 car sampleCount * inputCountPerSample = 13 * 2 = 26 (soit 13 images de 2 pixels donc 26 pixels au total)
     double Xtrains[26] = {
@@ -249,8 +255,8 @@ int main() {
     std::cout << std::endl <<  "Classification : " << std::endl;
 
     std::cout <<  "Before Rosenblatt : " << std::endl;
-    displayMatrix(model, 1, inputCountPerSample+1);
-    double* modelClas = fit_classification(model, Xtrains, Ytrains, sampleCount, inputCountPerSample, alpha, epochs);
+    displayMatrix(model1, 1, inputCountPerSample+1);
+    double* modelClas = fit_classification(model1, Xtrains, Ytrains, sampleCount, inputCountPerSample, alpha, epochs);
     std::cout <<  "After Rosenblatt : " << std::endl;
     displayMatrix(modelClas, 1, inputCountPerSample+1);
 
@@ -269,8 +275,8 @@ int main() {
     std::cout << std::endl <<  "Regression : " << std::endl;
 
     std::cout << "Before regression : " << std::endl;
-    displayMatrix(model, 1, inputCountPerSample+1);
-    double* modelReg = fit_regression(model, Xtrains, Ytrains, sampleCount, inputCountPerSample);
+    displayMatrix(model2, 1, inputCountPerSample+1);
+    double* modelReg = fit_regression(model2, Xtrains, Ytrains, sampleCount, inputCountPerSample);
     std::cout << "After regression : " << std::endl;
     displayMatrix(modelReg, 1, inputCountPerSample+1);
 
@@ -296,7 +302,7 @@ int main() {
 //        printf("%4.2f | ", i < 0 ? 0 : i );
 //        for (double j = 0; j <= 2.05; j+=0.05) {
 //            double value[2] = {i, j};
-//            if(predict_classification(model, value, 2) == 1){
+//            if(predict_classification(model1, value, 2) == 1){
 //                std::cout << " - ";
 //            }else{
 //                std::cout << " x ";
@@ -315,7 +321,7 @@ int main() {
 //        printf("%4.2f | ", i < 0 ? 0 : i );
 //        for (double j = 0; j <= 2.05; j+=0.05) {
 //            double value[2] = {i, j};
-//            if(predict_regression(model, value, 2) == 1){
+//            if(predict_regression(model2, value, 2) == 1){
 //                std::cout << " - ";
 //            }else{
 //                std::cout << " x ";
@@ -327,4 +333,4 @@ int main() {
 
 }
 
-//}
+}

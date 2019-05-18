@@ -1,40 +1,50 @@
 #
 # Created by Baptiste Vasseur on 2019-05-01.
 #
-
-from ctypes import *
+import CLibrary as CLib
 
 
 def main():
-    dll = cdll.LoadLibrary("./Rosenblatt.so")
 
-    xtrain = (c_double * 26)(
-        *[0, 0, 1, 0, 0, 1, 2, 2, 1, 2, 2, 1, 0.25, 0.25, 0.1, 0.1, 0.15, 0.15, 0.3, 0.3, 3, 3, 1.5, 1.5, 2.5, 2.5])
-    ytrain = (c_double * 13)(*[-1, 1, 1, 1, 1, 1, -1, -1, -1, -1, 1, 1, 1])
+    X = [
+        0, 0,
+        1, 2,
+        1, 0,
+        0, 1,
+        2, 2,
+        2, 1,
+        0.25, 0.25,
+        0.1, 0.1,
+        0.15, 0.15,
+        0.3, 0.3,
+        3, 3,
+        1.5, 1.5,
+        2.5, 2.5
+    ]
 
-    inputtest = (c_double * 2)(*[0.0, 0.0])
+    Y = [-1, 1, 1, 1, 1, 1, -1, -1, -1, -1, 1, 1, 1]
 
-    samplecount = 13
-    inputcountpersample = 2
-    alpha = 0.001
-    epochs = 5000
+    inputCountPerSample = int(len(X) / len(Y))
 
-    dll.create_linear_model.argtypes = [c_int32]
-    dll.create_linear_model.restype = c_void_p
-    linear_model = dll.create_linear_model(2)
+    model = CLib.create_linear_model(inputCountPerSample)
 
-    dll.fit_classification.argtypes = [c_void_p, POINTER(ARRAY(c_double, 26)), POINTER(ARRAY(c_double, 13)), c_int32,
-                                       c_int32, c_float, c_int32]
-    dll.fit_classification.restype = c_double
+    print("Before Rosenblatt : ")
+    CLib.displayMatrix(model, 1, inputCountPerSample + 1)
+    CLib.fit_classification(model, X, Y, 0.001, 5000)
+    print("After Rosenblatt : ")
+    CLib.displayMatrix(model, 1, inputCountPerSample + 1)
 
-    modelclass = dll.fit_classification(linear_model, xtrain, ytrain, samplecount, inputcountpersample, alpha, epochs)
+    val1 = [0.25, 0.25]
+    res = CLib.predict_classification(model, val1)
+    print("- Prediction des points [0.25;0.25] (-1) : " + str(res))
 
-    # dll.predict_regression.argtypes = [c_void_p, POINTER(ARRAY(c_double, 2)), c_int32]
-    # dll.predict_regression.restype = c_double
-    # result = dll.predict_regression(modelclass, inputtest, 2)
+    val2 = [2.5, 2.5]
+    res = CLib.predict_classification(model, val2)
+    print("- Prediction des points [2.5;2.5] (1) : " + str(res))
 
-    # print(modelclass)
-    # print(result)
+    val3 = [1, 2]
+    res = CLib.predict_classification(model, val3)
+    print("- Prediction des points [1;2] : (1) " + str(res))
 
 
 if __name__ == "__main__":
