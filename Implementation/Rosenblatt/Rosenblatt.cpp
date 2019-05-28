@@ -159,7 +159,7 @@ SUPEREXPORT double predict_classification(
 }
 
 SUPEREXPORT double* fit_regression(
-        double *W,
+        double *W, // to remove
         double *XTrain,
         double *YTrain,
         int sampleCount, // nombre d'image (ligne)
@@ -273,25 +273,25 @@ int main() {
      * Classification
      */
 
-//    std::cout << std::endl <<  "Classification : " << std::endl;
-//
-//    std::cout <<  "Before Rosenblatt : " << std::endl;
-//    displayMatrix(model1, 1, inputCountPerSample+1);
-//    double* modelClas = fit_classification(model1, Xtrains, Ytrains, sampleCount, inputCountPerSample, alpha, epochs);
-//    std::cout <<  "After Rosenblatt : " << std::endl;
-//    displayMatrix(modelClas, 1, inputCountPerSample+1);
-//
-//    double valC_1[2] = {0.25, 0.25};
-//    double valC_2[2] = {2.5, 2.5};
-//    double valC_3[2] = {1, 2};
-//    double valC_4[2] = {0.3, 0.3};
-//    double valC_5[2] = {3, 3};
-//
-//    std::cout << "- Prediction des points [0.25;0.25] (-1) : " << predict_classification(modelClas, valC_1, inputCountPerSample) << std::endl; // -1
-//    std::cout << "- Prediction des points [2.5;2.5] (1) : " << predict_classification(modelClas, valC_2, inputCountPerSample) << std::endl; // 1
-//    std::cout << "- Prediction des points [1;2] (1) : " << predict_classification(modelClas, valC_3, inputCountPerSample) << std::endl; // 1
-//    std::cout << "- Prediction des points [0.3;0.3] (-1) : " << predict_classification(modelClas, valC_4, inputCountPerSample) << std::endl; // -1
-//    std::cout << "- Prediction des points [3;3] (1) : " << predict_classification(modelClas, valC_5, inputCountPerSample) << std::endl; // 1
+    std::cout << std::endl <<  "Classification : " << std::endl;
+
+    std::cout <<  "Before Rosenblatt : " << std::endl;
+    displayMatrix(model1, 1, inputCountPerSample+1);
+    double* modelClas = fit_classification(model1, Xtrains, Ytrains, sampleCount, inputCountPerSample, alpha, epochs);
+    std::cout <<  "After Rosenblatt : " << std::endl;
+    displayMatrix(modelClas, 1, inputCountPerSample+1);
+
+    double valC_1[2] = {0.25, 0.25};
+    double valC_2[2] = {2.5, 2.5};
+    double valC_3[2] = {1, 2};
+    double valC_4[2] = {0.3, 0.3};
+    double valC_5[2] = {3, 3};
+
+    std::cout << "- Prediction des points [0.25;0.25] (-1) : " << predict_classification(modelClas, valC_1, inputCountPerSample) << std::endl; // -1
+    std::cout << "- Prediction des points [2.5;2.5] (1) : " << predict_classification(modelClas, valC_2, inputCountPerSample) << std::endl; // 1
+    std::cout << "- Prediction des points [1;2] (1) : " << predict_classification(modelClas, valC_3, inputCountPerSample) << std::endl; // 1
+    std::cout << "- Prediction des points [0.3;0.3] (-1) : " << predict_classification(modelClas, valC_4, inputCountPerSample) << std::endl; // -1
+    std::cout << "- Prediction des points [3;3] (1) : " << predict_classification(modelClas, valC_5, inputCountPerSample) << std::endl; // 1
 
     /*
      * Regression
