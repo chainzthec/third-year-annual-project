@@ -9,7 +9,7 @@ myDll = cdll.LoadLibrary("./MultiLayerPerceptron.so")
 
 def init_XTrain(XTrain, sampleCount, inputCountPerSample):
     XTrainPointer = convertToMatrix(XTrain, sampleCount, inputCountPerSample)
-    #
+
     myDll.addMatrixBias.argtypes = [
         c_void_p,
         c_int32,
@@ -35,26 +35,36 @@ def convertToMatrix(tab, sampleCount, inputCountPerSample):
     return myDll.convertToMatrix(tabPointer, sampleCount, inputCountPerSample)
 
 
-def init_mlp(neurons):
-    neuronPointer = (c_double * len(neurons))(*neurons)
-    print(neuronPointer)
-    myDll.init_mlp.argtypes = [
+def fit(neurons, XTrainFinal, YTrainFinal, sampleCounts, epochs, alpha):
+
+    neuronSize = len(neurons)
+    neuronPointer = (c_double * neuronSize)(*neurons)
+
+    myDll.fit.argtypes = [
         POINTER(ARRAY(c_double, len(neurons))),
-        c_int32
+        c_int32,
+        c_void_p,
+        c_void_p,
+        c_int32,
+        c_int32,
+        c_double
     ]
 
-    myDll.init_mlp.restype = c_void_p
-    mlp = myDll.init_mlp(neuronPointer, 3)
+    myDll.fit.restype = c_void_p
+    return myDll.fit(neuronPointer, neuronSize, XTrainFinal, YTrainFinal, sampleCounts, epochs, alpha)
 
-    # return mlp
 
-    # myDll.init_model.argtypes = [
-    #     c_void_p,
-    #     c_int32,
-    #     c_int32
-    # ]
-    #
-    # myDll.init_model.restype = c_void_p
-    # return myDll.init_model(mlp)
+def predict(mlp, xToPredict):
+    inputCountPerSample = len(xToPredict)
+    pointr = (c_double * inputCountPerSample)(*xToPredict)
+
+    myDll.predict.argtypes = [
+        c_void_p,
+        POINTER(ARRAY(c_double, inputCountPerSample)),
+        c_int32,
+    ]
+
+    myDll.predict.restype = c_void_p
+    return myDll.predict(mlp, pointr, inputCountPerSample)
 
 

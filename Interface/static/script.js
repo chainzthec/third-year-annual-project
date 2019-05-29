@@ -80,7 +80,8 @@ function uploadFormData(image) {
 		processData: false,
 		success: function(response){
 
-			//addNotification('success', 'Voilà !',response.message);
+			addNotification('success', 'Voilà !', "Réponse du serveur", false);
+			// addNotification('success', 'Voilà !', response.message);
 
 			console.log(response);
 			let reader = new FileReader();
@@ -102,14 +103,14 @@ function uploadFormData(image) {
 	});
 }
 
-let addNotification = function(type, title, content){
+let addNotification = function(type, title, content, hideAfter = 2500){
 	$.toast({
 		heading: title,
 		text: content,
 		position: 'top-right',
 		loaderBg: "#ff6849",
 		icon: type,
-		hideAfter: 2500,
+		hideAfter: hideAfter,
 		stack: 6,
 	});
 };
