@@ -3,4 +3,5 @@ project(ProjetAnnuel)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(ProjetAnnuel Implementation/Librairie/Matrix.h Implementation/Rosenblatt/Rosenblatt.cpp Implementation/MLP/MultiLayerPerceptron.cpp)
+add_executable(ProjetAnnuel  Implementation/Librairie/Matrix.h Implementation/MLP/MultiLayerPerceptron.cpp)
+#add_executable(ProjetAnnuel Implementation/Librairie/Matrix.h Implementation/Rosenblatt/Rosenblatt.cpp)

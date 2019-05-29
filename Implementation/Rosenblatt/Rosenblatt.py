@@ -38,11 +38,11 @@ def main():
     print("After Classification : ")
     CLib.displayMatrix(trainedModelClassif, 1, inputCountPerSample + 1)
 
-    launchClassificationText(trainedModelClassif, [0.25, 0.25], -1)
-    launchClassificationText(trainedModelClassif, [2.5, 2.5], 1)
-    launchClassificationText(trainedModelClassif, [1, 2], 1)
-    launchClassificationText(trainedModelClassif, [0.3, 0.3], -1)
-    launchClassificationText(trainedModelClassif, [3, 3], 1)
+    CLib.launchClassificationText(trainedModelClassif, [0.25, 0.25], -1)
+    CLib.launchClassificationText(trainedModelClassif, [2.5, 2.5], 1)
+    CLib.launchClassificationText(trainedModelClassif, [1, 2], 1)
+    CLib.launchClassificationText(trainedModelClassif, [0.3, 0.3], -1)
+    CLib.launchClassificationText(trainedModelClassif, [3, 3], 1)
 
     #
     #
@@ -56,22 +56,11 @@ def main():
     print("After Regression : ")
     CLib.displayMatrix(trainedModelReg, 1, inputCountPerSample + 1)
 
-    launchRegressionText(trainedModelReg, [0, 0], -1)
-    launchRegressionText(trainedModelReg, [2.5, 2.5], 1)
-    launchRegressionText(trainedModelReg, [1.5, 1.5], 1)
-    launchRegressionText(trainedModelReg, [0.3, 0.3], -1)
-    launchRegressionText(trainedModelReg, [3, 3], 1)
-
-
-def launchClassificationText(model, value, expected):
-    res = CLib.predict_classification(model, value)
-    print("- Prediction des points "+str(value)+"  :  ("+str(expected)+") -> (" + str(int(res)) + ")")
-
-
-def launchRegressionText(model, value, expected):
-    res = CLib.predict_regression(model, value)
-    print("- Prediction des points "+str(value)+"  :  ("+str(expected)+") -> (" + str(int(res)) + ")")
-
+    CLib.launchRegressionText(trainedModelReg, [0, 0], -1)
+    CLib.launchRegressionText(trainedModelReg, [2.5, 2.5], 1)
+    CLib.launchRegressionText(trainedModelReg, [1.5, 1.5], 1)
+    CLib.launchRegressionText(trainedModelReg, [0.3, 0.3], -1)
+    CLib.launchRegressionText(trainedModelReg, [3, 3], 1)
 
 if __name__ == "__main__":
     main()

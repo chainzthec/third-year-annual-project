@@ -18,11 +18,11 @@
 //extern "C" {
 
 struct MLP{
-    int* npl;
-    int layer_count;
-    double*** W;
-    double** X;
-    double** deltas;
+    int* npl; // Neuron per layers
+    int layer_count; // Number of layer
+    double*** W; // All W values
+    double** X; // All X values
+    double** deltas; // All delta values
 };
 
 //IMPORT FROM ROSENBLATT ALGORITHM
@@ -56,7 +56,7 @@ SUPEREXPORT double** bias(int ligne, int col){
     return XTrain;
 }
 
-SUPEREXPORT double** oneDimToTwo(const double* XTrain, int ligne, int col){
+SUPEREXPORT double** convertToMatrix(const double* XTrain, int ligne, int col){
     int pos = 0;
     double** XTrainFin = bias(ligne, col);
 
@@ -72,13 +72,13 @@ SUPEREXPORT double** oneDimToTwo(const double* XTrain, int ligne, int col){
     return XTrainFin;
 }
 
-//MLP ALGORITHM
+// MLP ALGORITHM
 
-void init_model(MLP* mlp){
+SUPEREXPORT void init_model(MLP* mlp){
     mlp->W = new double**[mlp->layer_count];
 
     for (int l = 1; l < mlp->layer_count; ++l) {
-        int prev_neuron_count = mlp->npl[l - 1] + 1; //+1 pour le biais
+        int prev_neuron_count = mlp->npl[l - 1] + 1; // +1 pour le biais
         int cur_neuron_count = mlp->npl[l] + 1;
 
         mlp->W[l] = new double*[prev_neuron_count];
@@ -90,7 +90,7 @@ void init_model(MLP* mlp){
     }
 }
 
-void feedFoward(MLP* mlp){
+SUPEREXPORT void feedFoward(MLP* mlp){
 
     /**
      * feedFoward
@@ -117,8 +117,7 @@ void feedFoward(MLP* mlp){
 }
 
 
-
-double sommWxDelta(const double* w, int cur_neuron_count, double* delta){
+SUPEREXPORT double sommWxDelta(const double* w, int cur_neuron_count, const double* delta){
     double res = 0;
     for (int j = 1; j < cur_neuron_count; j++) {
         res += w[j] * delta[j];
@@ -126,7 +125,7 @@ double sommWxDelta(const double* w, int cur_neuron_count, double* delta){
     return res;
 }
 
-void initAllDeltaExpectLast(MLP* mlp, int lastIndex){
+SUPEREXPORT void initAllDeltaExeptLast(MLP* mlp, int lastIndex){
     for (int l = lastIndex; l > 0 ; l--) {
         int prev_neuron_count = mlp->npl[l - 1] + 1;
         int cur_neuron_count = mlp->npl[l] + 1;
@@ -139,7 +138,7 @@ void initAllDeltaExpectLast(MLP* mlp, int lastIndex){
     }
 }
 
-void initLastDelta_classification(MLP* mlp, int lastIndex, const double* YTrain){
+SUPEREXPORT void initLastDelta_classification(MLP* mlp, int lastIndex, const double* YTrain){
     mlp->deltas[lastIndex] = new double[mlp->npl[lastIndex] + 1];
     for (int j = 1; j < mlp->npl[lastIndex] + 1; j++) {
         double val = (1 - pow((mlp->X[lastIndex][j]),2)) * (mlp->X[lastIndex][j] - YTrain[j - 1]);
@@ -147,7 +146,7 @@ void initLastDelta_classification(MLP* mlp, int lastIndex, const double* YTrain)
     }
 }
 
-void initLastDelta_regression(MLP* mlp, int lastIndex, const double* YTrain){
+SUPEREXPORT void initLastDelta_regression(MLP* mlp, int lastIndex, const double* YTrain){
     mlp->deltas[lastIndex] = new double[mlp->npl[lastIndex] + 1];
     for (int j = 1; j < mlp->npl[lastIndex] + 1; j++) {
         double val = (mlp->X[lastIndex][j] - YTrain[j - 1]);
@@ -155,7 +154,7 @@ void initLastDelta_regression(MLP* mlp, int lastIndex, const double* YTrain){
     }
 }
 
-void updateW(MLP* mlp, int lastIndex, double alpha){
+SUPEREXPORT void updateW(MLP* mlp, int lastIndex, double alpha){
     for (int l = 1; l < lastIndex + 1; l++) {
         int prev_neuron_count = mlp->npl[l - 1] + 1;
         int cur_neuron_count = mlp->npl[l] + 1;
@@ -168,8 +167,8 @@ void updateW(MLP* mlp, int lastIndex, double alpha){
     }
 }
 
-void displayAllWValues(MLP* mlp){
-    //PRINT ALL W
+SUPEREXPORT void displayAllWValues(MLP* mlp){
+//  PRINT ALL W
     for (int l = 1; l < mlp->layer_count; ++l) {
         int prev_neuron_count = mlp->npl[l - 1] + 1; // +1 pour le biais
         int cur_neuron_count = mlp->npl[l] + 1;
@@ -182,8 +181,8 @@ void displayAllWValues(MLP* mlp){
     }
 }
 
-void displayAllXValues(MLP* mlp){
-    //PRINT ALL X
+SUPEREXPORT void displayAllXValues(MLP* mlp){
+//  PRINT ALL X
     for (int l = 0; l < mlp->layer_count; ++l) {
 //        std::cout << "x[" << l << "] : ";
         for (int j = 0; j < mlp->npl[l] + 1; ++j) {
@@ -195,8 +194,8 @@ void displayAllXValues(MLP* mlp){
     std::cout << std::endl;
 }
 
-void displayAllDeltaValues(MLP* mlp){
-    //PRINT ALL Deltas
+SUPEREXPORT void displayAllDeltaValues(MLP* mlp){
+//  PRINT ALL Deltas
     for (int l = 0; l < mlp->layer_count; ++l) {
 //    std::cout << "delta[" << l << "] : ";
         for (int j = 0; j < mlp->npl[l] + 1; ++j) {
@@ -208,7 +207,23 @@ void displayAllDeltaValues(MLP* mlp){
     std::cout << std::endl;
 }
 
+SUPEREXPORT MLP init_mlp(int neurons[], int size) {
+    MLP m{};
+    MLP* mlp;
+    mlp = &m;
+
+    mlp->layer_count = size;
+    mlp->npl = neurons;
+
+    mlp->X = new double*[mlp->layer_count];
+    mlp->deltas = new double*[mlp->layer_count];
+
+    return *mlp;
+}
+
 int main() {
+
+    // Init
 
     srand(time(nullptr));
 
@@ -223,72 +238,78 @@ int main() {
             0, 1,
             1, 1
     };
+    double YTrain[4] = {1, -1, -1, 1};
 
-    double YTrain[12] = {
-            1, -1, -1,
-            -1, 1, -1,
-            -1, 1, -1,
-            -1, -1, 1
-    };
+    auto xTrainFinal = convertToMatrix(XTrain, sampleCount, inputCountPerSample + 1);
+    auto YTrainFinal = convertToMatrix(YTrain, sampleCount, inputCountPerSample + 1);
 
-    MLP m;
-    MLP* mlp;
-    mlp = &m;
+    // MLP implemtation
 
-    mlp->layer_count = 4;
-
-    int NPL[4] = {2, 2,2, 3};
-    mlp->npl = NPL;
-
-    mlp->deltas = new double*[mlp->layer_count];
-    auto** x = new double*[mlp->layer_count];
-    mlp->X = x;
+    int neurons[3] = {2, 2, 1};
+    MLP mlp_pointer = init_mlp(neurons, 3);
+    MLP *mlp = &mlp_pointer;
 
     init_model(mlp);
 
-    auto x2 = oneDimToTwo(XTrain, sampleCount, inputCountPerSample + 1);
-    auto y2 = oneDimToTwo(YTrain, sampleCount, 3);
-
     int lastLayerIndex = mlp->layer_count - 1;
 
+//    displayAllXValues(mlp);
 //    displayAllWValues(mlp);
 
     for (int e = 0; e < epoch; ++e) {
         for (int i = 0; i < sampleCount; ++i) {
 
-            mlp->X[0] = x2[i];
-            //cout << "--> Feed Foward" << std::endl;
+            mlp->X[0] = xTrainFinal[i];
             feedFoward(mlp);
-            //cout << "--> Back Propagation" << std::endl;
 
-            initLastDelta_classification(mlp, lastLayerIndex, y2[i]);
-            initAllDeltaExpectLast(mlp, lastLayerIndex);
+            initLastDelta_classification(mlp, lastLayerIndex, YTrainFinal[i]);
+            initAllDeltaExeptLast(mlp, lastLayerIndex);
             updateW(mlp, lastLayerIndex, alpha);
         }
     }
 
+//    for (double i = 1; i >= -0.05; i-=0.05) {
+//
+//        printf("%4.2f > ", i);
+//        for (double j = 0; j <= 1.05; j+=0.05) {
+//
+//            double XtoPred1[3] = {1, i, j};
+//            mlp->X[0] = XtoPred1;
+//            feedFoward(mlp);
+//
+//            if(mlp->X[lastLayerIndex][1] > 0)
+//                std::cout << " x ";
+//            else
+//                std::cout << " - ";
+//
+//        }
+//        std::cout << "\n";
+//    }
+
+
+
 //    std::cout << "-------------------" << std::endl;
 //    displayAllWValues(mlp);
 
-    double XtoPred1[3] = {1, 0, 0};
-    mlp->X[0] = XtoPred1;
-    feedFoward(mlp);
-    displayAllXValues(mlp);
-
-    double XtoPred2[3] = {1, 0, 1};
-    mlp->X[0] = XtoPred2;
-    feedFoward(mlp);
-    displayAllXValues(mlp);
-
-    double XtoPred3[3] = {1, 1, 0};
-    mlp->X[0] = XtoPred3;
-    feedFoward(mlp);
-    displayAllXValues(mlp);
-
-    double XtoPred4[3] = {1, 1, 1};
-    mlp->X[0] = XtoPred4;
-    feedFoward(mlp);
-    displayAllXValues(mlp);
+//    double XtoPred1[3] = {1, 0, 0};
+//    mlp->X[0] = XtoPred1;
+//    feedFoward(mlp);
+//    displayAllXValues(mlp);
+//
+//    double XtoPred2[3] = {1, 0, 1};
+//    mlp->X[0] = XtoPred2;
+//    feedFoward(mlp);
+//    displayAllXValues(mlp);
+//
+//    double XtoPred3[3] = {1, 1, 0};
+//    mlp->X[0] = XtoPred3;
+//    feedFoward(mlp);
+//    displayAllXValues(mlp);
+//
+//    double XtoPred4[3] = {1, 1, 1};
+//    mlp->X[0] = XtoPred4;
+//    feedFoward(mlp);
+//    displayAllXValues(mlp);
 }
 
 

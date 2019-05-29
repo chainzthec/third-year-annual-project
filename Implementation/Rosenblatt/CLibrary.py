@@ -102,3 +102,14 @@ def displayMatrix(pointerVal, rows, cols):
 
     myDll.displayMatrix.restype = c_void_p
     myDll.displayMatrix(pointerVal, rows, cols)
+
+
+def launchClassificationText(model, value, expected):
+    res = predict_classification(model, value)
+    print("- Prediction des points "+str(value)+"  :  ("+str(expected)+") -> (" + str(int(res)) + ")")
+
+
+def launchRegressionText(model, value, expected):
+    res = predict_regression(model, value)
+    print("- Prediction des points "+str(value)+"  :  ("+str(expected)+") -> (" + str(int(res)) + ")")
+
