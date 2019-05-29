@@ -213,7 +213,7 @@ SUPEREXPORT double* fit_classification(
         double alpha, // Learning Rate (0,01 par exemple)
         int epochs // Nombre d'itération
 ) {
-    XTrain = addBias(XTrain, sampleCount, inputCountPerSample); // Segmentation Fault with python
+    XTrain = addBias(XTrain, sampleCount, inputCountPerSample);
     inputCountPerSample += 1;
     double** XTrainFin = oneDimToTwo(XTrain, sampleCount, inputCountPerSample);
 

@@ -13,10 +13,6 @@
 #include <cmath>
 #include <iostream>
 
-#include "../Librairie/Matrix.h"
-
-//extern "C" {
-
 struct MLP{
     int* npl; // Neuron per layers
     int layer_count; // Number of layer
@@ -24,6 +20,8 @@ struct MLP{
     double** X; // All X values
     double** deltas; // All delta values
 };
+
+extern "C" {
 
 //IMPORT FROM ROSENBLATT ALGORITHM
 
@@ -45,20 +43,39 @@ SUPEREXPORT double* create_linear_model(int inputCountPerSample) {
     return res;
 }
 
+SUPEREXPORT double** addMatrixBias(double** XtoPred1, int sampleCount, int inputCountPerSample){
 
-SUPEREXPORT double** bias(int ligne, int col){
-    auto XTrain = new double*[ligne];
+    auto* res = new double*[sampleCount];
 
-    for (int i = 0; i < ligne; ++i) {
-        XTrain[i] = new double[col];
-        XTrain[i][0] = 1.0;
+    for (int j = 0; j < sampleCount; ++j) {
+        res[j] = new double[inputCountPerSample + 1];
+        res[j][0] = 1.0;
+
+        for (int i = 0; i < inputCountPerSample; ++i) {
+            res[j][i+1] = XtoPred1[j][i];
+        }
     }
-    return XTrain;
+
+    return res;
+}
+
+SUPEREXPORT double* addBias(const double* XLineToPred, int inputCountPerSample){
+    auto res = new double[inputCountPerSample + 1];
+
+    for (int i = 0; i < inputCountPerSample; ++i) {
+        res[0] = 1.0;
+
+        for (int j = 0; j < inputCountPerSample; ++j) {
+            res[i+1] = XLineToPred[i];
+        }
+
+    }
+    return res;
 }
 
 SUPEREXPORT double** convertToMatrix(const double* XTrain, int ligne, int col){
     int pos = 0;
-    double** XTrainFin = bias(ligne, col);
+    auto** XTrainFin = new double*[ligne];
 
     for (int i = 0; i < ligne; i++) {
         XTrainFin[i] = new double[col];
@@ -208,15 +225,15 @@ SUPEREXPORT void displayAllDeltaValues(MLP* mlp){
 }
 
 SUPEREXPORT MLP init_mlp(int neurons[], int size) {
-    MLP m{};
+    MLP m;
     MLP* mlp;
     mlp = &m;
 
     mlp->layer_count = size;
     mlp->npl = neurons;
 
-    mlp->X = new double*[mlp->layer_count];
-    mlp->deltas = new double*[mlp->layer_count];
+    mlp->X = new double*[size];
+    mlp->deltas = new double*[size];
 
     return *mlp;
 }
@@ -230,7 +247,7 @@ int main() {
     int sampleCount = 4;
     int inputCountPerSample = 2;
     double alpha = 0.001;
-    int epoch = 10000;
+    int epochs = 50000;
 
     double XTrain[8] = {
             0, 0,
@@ -240,8 +257,17 @@ int main() {
     };
     double YTrain[4] = {1, -1, -1, 1};
 
-    auto xTrainFinal = convertToMatrix(XTrain, sampleCount, inputCountPerSample + 1);
-    auto YTrainFinal = convertToMatrix(YTrain, sampleCount, inputCountPerSample + 1);
+    auto xTrainFinal = convertToMatrix(XTrain, sampleCount, inputCountPerSample);
+    xTrainFinal = addMatrixBias(xTrainFinal, sampleCount, inputCountPerSample);
+
+    auto YTrainFinal = convertToMatrix(YTrain, sampleCount, 1);
+
+//    for (int i = 0; i < sampleCount; ++i) {
+//        for (int j = 0; j < 1; ++j) {
+//            std::cout << YTrainFinal[i][j] << " - ";
+//        }
+//        std::cout << std::endl;
+//    }
 
     // MLP implemtation
 
@@ -256,7 +282,7 @@ int main() {
 //    displayAllXValues(mlp);
 //    displayAllWValues(mlp);
 
-    for (int e = 0; e < epoch; ++e) {
+    for (int e = 0; e < epochs; ++e) {
         for (int i = 0; i < sampleCount; ++i) {
 
             mlp->X[0] = xTrainFinal[i];
@@ -268,49 +294,51 @@ int main() {
         }
     }
 
-//    for (double i = 1; i >= -0.05; i-=0.05) {
-//
-//        printf("%4.2f > ", i);
-//        for (double j = 0; j <= 1.05; j+=0.05) {
-//
-//            double XtoPred1[3] = {1, i, j};
-//            mlp->X[0] = XtoPred1;
-//            feedFoward(mlp);
-//
-//            if(mlp->X[lastLayerIndex][1] > 0)
-//                std::cout << " x ";
-//            else
-//                std::cout << " - ";
-//
-//        }
-//        std::cout << "\n";
-//    }
+    for (double i = 1; i >= -0.05; i-=0.05) {
 
+        printf("%4.2f > ", i);
+        for (double j = 0; j <= 1.05; j+=0.05) {
 
+            double XtoPred1[3] = {1, i, j};
+            mlp->X[0] = XtoPred1;
+            feedFoward(mlp);
+
+            if(mlp->X[lastLayerIndex][1] > 0)
+                std::cout << " x ";
+            else
+                std::cout << " - ";
+
+        }
+        std::cout << "\n";
+    }
 
 //    std::cout << "-------------------" << std::endl;
 //    displayAllWValues(mlp);
 
-//    double XtoPred1[3] = {1, 0, 0};
-//    mlp->X[0] = XtoPred1;
-//    feedFoward(mlp);
-//    displayAllXValues(mlp);
-//
-//    double XtoPred2[3] = {1, 0, 1};
-//    mlp->X[0] = XtoPred2;
-//    feedFoward(mlp);
-//    displayAllXValues(mlp);
-//
-//    double XtoPred3[3] = {1, 1, 0};
-//    mlp->X[0] = XtoPred3;
-//    feedFoward(mlp);
-//    displayAllXValues(mlp);
-//
-//    double XtoPred4[3] = {1, 1, 1};
-//    mlp->X[0] = XtoPred4;
-//    feedFoward(mlp);
-//    displayAllXValues(mlp);
+    std::cout << "------- 0 - 0 -> (attendu : 1) ----------" << std::endl;
+    double XtoPred1[2] = {0, 0};
+    mlp->X[0] = addBias(XtoPred1, inputCountPerSample);
+    feedFoward(mlp);
+    displayAllXValues(mlp);
+
+    std::cout << "------- 1 - 0 -> (attendu : -1) ----------" << std::endl;
+    double XtoPred2[2] = {1, 0};
+    mlp->X[0] = addBias(XtoPred2, inputCountPerSample);
+    feedFoward(mlp);
+    displayAllXValues(mlp);
+
+    std::cout << "------- 0 - 1 -> (attendu : -1) ----------" << std::endl;
+    double XtoPred3[2] = {0, 1};
+    mlp->X[0] = addBias(XtoPred3, inputCountPerSample);
+    feedFoward(mlp);
+    displayAllXValues(mlp);
+
+    std::cout << "------- 1 - 1 -> (attendu : 1) ----------" << std::endl;
+    double XtoPred4[2] = {1, 1};
+    mlp->X[0] = addBias(XtoPred4, inputCountPerSample);
+    feedFoward(mlp);
+    displayAllXValues(mlp);
 }
 
 
-//}
+}
