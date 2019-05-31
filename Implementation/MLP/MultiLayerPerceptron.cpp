@@ -276,7 +276,7 @@ SUPEREXPORT MLP* init(const int* neurons, int size){
     return mlp;
 }
 
-SUPEREXPORT MLP* fit(MLP* mlp, double* XTrain, double* YTrain, int sampleCount, int inputCountPerSample, int epochs, double alpha) {
+SUPEREXPORT MLP* fit_classification(MLP* mlp, double* XTrain, double* YTrain, int sampleCount, int inputCountPerSample, int epochs, double alpha) {
 
     double** XTrainFinal = convertToMatrix(XTrain, sampleCount, inputCountPerSample);
     XTrainFinal = addMatrixBias(XTrainFinal, sampleCount, inputCountPerSample);
@@ -286,11 +286,6 @@ SUPEREXPORT MLP* fit(MLP* mlp, double* XTrain, double* YTrain, int sampleCount, 
 //    displayAllXValues(mlp);
 //    displayAllWValues(mlp);
 
-    for (int j = 0; j < 3; ++j) {
-        std::cout << mlp->npl[j] << " - ";
-    }
-    std::cout << std::endl;
-
     for (int e = 0; e < epochs; ++e) {
         for (int i = 0; i < sampleCount; ++i) {
 
@@ -298,6 +293,33 @@ SUPEREXPORT MLP* fit(MLP* mlp, double* XTrain, double* YTrain, int sampleCount, 
             feedFoward(mlp);
 
             initLastDelta_classification(mlp, mlp->lastLayerIndex, YTrainFinal[i]);
+            initAllDeltaExceptLast(mlp, mlp->lastLayerIndex);
+            updateW(mlp, mlp->lastLayerIndex, alpha);
+        }
+    }
+
+//    std::cout << "Debug 1 : " << &mlp << " LayerCount: " << mlp->layer_count << std::endl;
+
+    return mlp;
+}
+
+SUPEREXPORT MLP* fit_regression(MLP* mlp, double* XTrain, double* YTrain, int sampleCount, int inputCountPerSample, int epochs, double alpha) {
+
+    double** XTrainFinal = convertToMatrix(XTrain, sampleCount, inputCountPerSample);
+    XTrainFinal = addMatrixBias(XTrainFinal, sampleCount, inputCountPerSample);
+
+    double** YTrainFinal = convertToMatrix(YTrain, sampleCount, 1);
+
+//    displayAllXValues(mlp);
+//    displayAllWValues(mlp);
+
+    for (int e = 0; e < epochs; ++e) {
+        for (int i = 0; i < sampleCount; ++i) {
+
+            mlp->X[0] = XTrainFinal[i];
+            feedFoward(mlp);
+
+            initLastDelta_regression(mlp, mlp->lastLayerIndex, YTrainFinal[i]);
             initAllDeltaExceptLast(mlp, mlp->lastLayerIndex);
             updateW(mlp, mlp->lastLayerIndex, alpha);
         }
@@ -336,7 +358,7 @@ int main() {
     int neurons[3] = {2, 2, 1};
     MLP* mlp = init(neurons, 3);
 
-    mlp = fit(mlp, XTrain, YTrain, sampleCount, inputCountPerSample, epochs, alpha);
+    mlp = fit_classification(mlp, XTrain, YTrain, sampleCount, inputCountPerSample, epochs, alpha);
 
     double XtoPred1[2] = {0, 0};
     predict(mlp, XtoPred1, inputCountPerSample);

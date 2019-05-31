@@ -20,7 +20,7 @@ def main():
     Y = [1, -1, -1, 1]
 
     mlp = CLib.init(N)
-    mlp = CLib.fit(mlp, X, Y, epochs, alpha)
+    mlp = CLib.fit_classification(mlp, X, Y, epochs, alpha)
 
     predictions = CLib.predict(mlp, [0, 0], N)
     print(predictions)
