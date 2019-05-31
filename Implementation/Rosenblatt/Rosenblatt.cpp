@@ -15,7 +15,7 @@
 
 #include "../Librairie/Matrix.h"
 
-//extern "C" {
+extern "C" {
 
 /*
  *
@@ -27,6 +27,7 @@
 // bias = position de la droite, a et b orientation de la droite
 
 SUPEREXPORT double getRand(double min, double max) {
+
     double val = (double) rand() / RAND_MAX;
     val = min + val * (max - min);
 
@@ -35,6 +36,7 @@ SUPEREXPORT double getRand(double min, double max) {
 
 SUPEREXPORT double* create_linear_model(int inputCountPerSample) {
     auto res = new double[inputCountPerSample + 1];
+
     for (int i = 0; i < inputCountPerSample + 1; i++) {
         res[i] = getRand(-1.0, 1.0);
     }
@@ -59,7 +61,12 @@ SUPEREXPORT void displayMatrix(double* matrix, int rows, int cols){
     int count = 0;
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
-            std::cout << matrix[count] << " - ";
+            std::cout << matrix[count];
+
+            if(j+1 < cols){
+                std::cout << " | ";
+            }
+
             count++;
         }
         std::cout << std::endl;
@@ -68,21 +75,40 @@ SUPEREXPORT void displayMatrix(double* matrix, int rows, int cols){
     std::cout << std::endl;
 }
 
-SUPEREXPORT double* addBias(double* mat, int lines, int cols) {
+SUPEREXPORT double* addBias(const double* mat, int lines, int cols) {
     int bias = 1;
 
-    Matrix<double> matrix = transformDoubleToMatrix(mat, lines, cols);
-    Matrix<double> result(matrix.getRows(), matrix.getColumns() + 1);
+    auto XTrain = new double[lines * (cols+1)];
 
-    for (int i = 0; i < matrix.getRows(); ++i) {
-        result.put(i, 0, bias);
-        for (int j = 0; j < matrix.getColumns(); ++j) {
-            result.put(i, j + 1, matrix.get(i, j));
+    int pos = 0;
+    int count = 0;
+
+    for (int i = 0; i < lines; ++i) {
+        XTrain[count] = bias;
+        count += 1;
+
+        for (int j = 0; j < cols; ++j) {
+            XTrain[count] = mat[pos];
+            count += 1;
+            pos += 1;
         }
     }
 
-    double* res = result.convertToDouble();
-    return res;
+    return XTrain;
+
+//    Matrix<double> matrix = transformDoubleToMatrix(mat, lines, cols);
+//    Matrix<double> result(lines, cols);
+//    Matrix<double> result(lines, cols + 1);
+//
+//    for (int i = 0; i < matrix.getRows(); ++i) {
+//        result.put(i, 0, bias);
+//        for (int j = 0; j < matrix.getColumns(); ++j) {
+//            result.put(i, j + 1, matrix.get(i, j));
+//        }
+//    }
+
+//    double* res = result.convertToDouble();
+//    return res;
 }
 
 /*
@@ -133,7 +159,7 @@ SUPEREXPORT double predict_classification(
 }
 
 SUPEREXPORT double* fit_regression(
-        double *W,
+        double *W, // to remove
         double *XTrain,
         double *YTrain,
         int sampleCount, // nombre d'image (ligne)
@@ -210,8 +236,6 @@ SUPEREXPORT void delete_linear_model(const double *W) {
     delete[] W;
 }
 
-
-
 int main() {
 
     srand(time(nullptr)); // Enable rand() function
@@ -221,7 +245,8 @@ int main() {
     int epochs = 5000;
     double alpha = 0.001;
 
-    double* model = create_linear_model(inputCountPerSample);
+    double* model1 = create_linear_model(inputCountPerSample);
+    double* model2 = create_linear_model(inputCountPerSample);
 
     // 26 car sampleCount * inputCountPerSample = 13 * 2 = 26 (soit 13 images de 2 pixels donc 26 pixels au total)
     double Xtrains[26] = {
@@ -251,18 +276,22 @@ int main() {
     std::cout << std::endl <<  "Classification : " << std::endl;
 
     std::cout <<  "Before Rosenblatt : " << std::endl;
-    displayMatrix(model, 1, inputCountPerSample+1);
-    double* modelClas = fit_classification(model, Xtrains, Ytrains, sampleCount, inputCountPerSample, alpha, epochs);
+    displayMatrix(model1, 1, inputCountPerSample+1);
+    double* modelClas = fit_classification(model1, Xtrains, Ytrains, sampleCount, inputCountPerSample, alpha, epochs);
     std::cout <<  "After Rosenblatt : " << std::endl;
     displayMatrix(modelClas, 1, inputCountPerSample+1);
 
-    double val1[2] = {0.25, 0.25};
-    double val2[2] = {2.5, 2.5};
-    double val3[2] = {1, 2};
+    double valC_1[2] = {0.25, 0.25};
+    double valC_2[2] = {2.5, 2.5};
+    double valC_3[2] = {1, 2};
+    double valC_4[2] = {0.3, 0.3};
+    double valC_5[2] = {3, 3};
 
-    std::cout << "- Prediction des points [0.25;0.25] (-1) : " << predict_classification(modelClas, val1, inputCountPerSample) << std::endl; // -1
-    std::cout << "- Prediction des points [2.5;2.5] (1) : " << predict_classification(modelClas, val2, inputCountPerSample) << std::endl; // 1
-    std::cout << "- Prediction des points [1;2] : (1) " << predict_classification(modelClas, val3, inputCountPerSample) << std::endl; // 1
+    std::cout << "- Prediction des points [0.25;0.25] (-1) : " << predict_classification(modelClas, valC_1, inputCountPerSample) << std::endl; // -1
+    std::cout << "- Prediction des points [2.5;2.5] (1) : " << predict_classification(modelClas, valC_2, inputCountPerSample) << std::endl; // 1
+    std::cout << "- Prediction des points [1;2] (1) : " << predict_classification(modelClas, valC_3, inputCountPerSample) << std::endl; // 1
+    std::cout << "- Prediction des points [0.3;0.3] (-1) : " << predict_classification(modelClas, valC_4, inputCountPerSample) << std::endl; // -1
+    std::cout << "- Prediction des points [3;3] (1) : " << predict_classification(modelClas, valC_5, inputCountPerSample) << std::endl; // 1
 
     /*
      * Regression
@@ -271,18 +300,22 @@ int main() {
     std::cout << std::endl <<  "Regression : " << std::endl;
 
     std::cout << "Before regression : " << std::endl;
-    displayMatrix(model, 1, inputCountPerSample+1);
-    double* modelReg = fit_regression(model, Xtrains, Ytrains, sampleCount, inputCountPerSample);
+    displayMatrix(model2, 1, inputCountPerSample+1);
+    double* modelReg = fit_regression(model2, Xtrains, Ytrains, sampleCount, inputCountPerSample);
     std::cout << "After regression : " << std::endl;
     displayMatrix(modelReg, 1, inputCountPerSample+1);
 
-    double val4[2] = {0, 0};
-    double val5[2] = {2.5, 2.5};
-    double val6[2] = {1.5, 1.5};
+    double valR_1[2] = {0, 0};
+    double valR_2[2] = {2.5, 2.5};
+    double valR_3[2] = {1.5, 1.5};
+    double valR_4[2] = {0.3, 0.3};
+    double valR_5[2] = {3, 3};
 
-    std::cout << "- Régression des points [0;0] (-1) : " << predict_regression(modelReg, val4, inputCountPerSample) << std::endl; // -1
-    std::cout << "- Régression des points [2.5;2.5] (1) : " << predict_regression(modelReg, val5, inputCountPerSample) << std::endl; // 1
-    std::cout << "- Régression des points [1.5;1.5] (1) : " << predict_regression(modelReg, val6, inputCountPerSample) << std::endl; // 1
+    std::cout << "- Régression des points [0;0] (-1) : " << predict_regression(modelReg, valR_1, inputCountPerSample) << std::endl; // -1
+    std::cout << "- Régression des points [2.5;2.5] (1) : " << predict_regression(modelReg, valR_2, inputCountPerSample) << std::endl; // 1
+    std::cout << "- Régression des points [1.5;1.5] (1) : " << predict_regression(modelReg, valR_3, inputCountPerSample) << std::endl; // 1
+    std::cout << "- Régression des points [0.3;0.3] (-1) : " << predict_regression(modelReg, valR_4, inputCountPerSample) << std::endl; // -1
+    std::cout << "- Régression des points [3;3] (1) : " << predict_regression(modelReg, valR_5, inputCountPerSample) << std::endl; // 1
 
     /*
      * Graphe
@@ -298,7 +331,7 @@ int main() {
 //        printf("%4.2f | ", i < 0 ? 0 : i );
 //        for (double j = 0; j <= 2.05; j+=0.05) {
 //            double value[2] = {i, j};
-//            if(predict_classification(model, value, 2) == 1){
+//            if(predict_classification(model1, value, 2) == 1){
 //                std::cout << " - ";
 //            }else{
 //                std::cout << " x ";
@@ -317,7 +350,7 @@ int main() {
 //        printf("%4.2f | ", i < 0 ? 0 : i );
 //        for (double j = 0; j <= 2.05; j+=0.05) {
 //            double value[2] = {i, j};
-//            if(predict_regression(model, value, 2) == 1){
+//            if(predict_regression(model2, value, 2) == 1){
 //                std::cout << " - ";
 //            }else{
 //                std::cout << " x ";
@@ -329,4 +362,4 @@ int main() {
 
 }
 
-//}
+}

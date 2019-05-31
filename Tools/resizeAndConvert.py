@@ -7,7 +7,8 @@
 import os, sys
 from PIL import Image
 
-filepath = input("Dossier à parcourir : ").rstrip(' ') + '/'
+filepath = input("Dossier à parcourir : ")
+filepath = filepath.rstrip(' ') + '/'.replace("\\ ", ' ')
 imgL = int(input("Largeur de l'image en px : "))
 imgH = int(input("Hauteur de l'image en px : "))
 

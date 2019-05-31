@@ -3,3 +3,6 @@ cmake-build-debug/
 implementation/dll/Dll1/.vs/
 .DS_Store
 *.pyc
+Implementation/Rosenblatt/.ipynb_checkpoints/
+Implementation/Rosenblatt/__pycache__/
+Implementation/MLP/__pycache__/

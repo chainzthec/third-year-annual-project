@@ -10,12 +10,11 @@ from decoder.decoder import launchTraitment
 
 
 def home(request):
-    test = "coucou"
+    test = "coucou toi"
     return render(request, 'index.html', locals())
 
 
 def upload(request):
-
     if request.is_ajax():
         image = request.FILES.get("image")
         typeisCorrect = image.content_type in application.settings.VALID_TYPES
@@ -32,7 +31,7 @@ def upload(request):
                 file.save(bytesio, 'JPEG', quality=90)
                 serializedImage = bytesio.getvalue()
 
-                return JsonResponse( launchTraitment(serializedImage) )
+                return JsonResponse(launchTraitment(serializedImage))
 
             except Exception:
                 return JsonResponse({"error": "Erreur ! Impossible de redimensionner l'image !"}, status=200)
@@ -40,5 +39,3 @@ def upload(request):
             return JsonResponse({"error": "Erreur ! Type d'image non supportée !"}, status=500)
     else:
         return JsonResponse({"error": "Erreur ! not xmlhttprequest"}, status=500)
-
-

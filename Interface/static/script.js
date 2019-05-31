@@ -47,7 +47,14 @@ dropContainer.on('drop', function(e) {
 
 $('input[type="file"]').change(function(){
 	let image = this.files[0];
-	uploadFormData(image);
+
+	let t = image.type;
+	if(t === "image/gif" || t === "image/jpeg" || t === "image/png"){
+		uploadFormData(image);
+	}else{
+		addNotification('error', 'Aïe !!', 'Type de fichier incorrect !');
+	}
+
 });
 
 
@@ -72,6 +79,10 @@ function uploadFormData(image) {
 		cache: false,
 		processData: false,
 		success: function(response){
+
+			addNotification('success', 'Voilà !', "Réponse du serveur", false);
+			// addNotification('success', 'Voilà !', response.message);
+
 			console.log(response);
 			let reader = new FileReader();
 			reader.onload = function (e) {
@@ -84,10 +95,22 @@ function uploadFormData(image) {
 		},
 		error: function(response){
 			if (response.error) {
-                alert(response.error);
+                addNotification('error', 'Ohh !', response.error);
             } else {
-                alert("Oooups something went wrong :/");
+                addNotification('error', 'Erreur !!', "Oooups something went wrong :/");
             }
 		}
 	});
 }
+
+let addNotification = function(type, title, content, hideAfter = 2500){
+	$.toast({
+		heading: title,
+		text: content,
+		position: 'top-right',
+		loaderBg: "#ff6849",
+		icon: type,
+		hideAfter: hideAfter,
+		stack: 6,
+	});
+};

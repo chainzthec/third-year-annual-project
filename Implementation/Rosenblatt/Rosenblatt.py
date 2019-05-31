@@ -1,41 +1,66 @@
 #
 # Created by Baptiste Vasseur on 2019-05-01.
 #
-
-from ctypes import *
+import CLibrary as CLib
 
 
 def main():
-    dll = cdll.LoadLibrary("./Rosenblatt.so")
 
-    xtrain = (c_double * 26)(
-        *[0, 0, 1, 0, 0, 1, 2, 2, 1, 2, 2, 1, 0.25, 0.25, 0.1, 0.1, 0.15, 0.15, 0.3, 0.3, 3, 3, 1.5, 1.5, 2.5, 2.5])
-    ytrain = (c_double * 13)(*[-1, 1, 1, 1, 1, 1, -1, -1, -1, -1, 1, 1, 1])
+    X = [
+        0, 0,
+        1, 2,
+        1, 0,
+        0, 1,
+        2, 2,
+        2, 1,
+        0.25, 0.25,
+        0.1, 0.1,
+        0.15, 0.15,
+        0.3, 0.3,
+        3, 3,
+        1.5, 1.5,
+        2.5, 2.5
+    ]
 
-    inputtest = (c_double * 2)(*[0.0, 0.0])
+    Y = [-1, 1, 1, 1, 1, 1, -1, -1, -1, -1, 1, 1, 1]
 
-    samplecount = 13
-    inputcountpersample = 2
-    alpha = 0.001
-    epochs = 5000
+    inputCountPerSample = int(len(X) / len(Y))
 
-    dll.create_linear_model.argtypes = [c_int32]
-    dll.create_linear_model.restype = c_void_p
-    linear_model = dll.create_linear_model(2)
+    #
+    #
+    #
 
-    dll.fit_classification.argtypes = [c_void_p, POINTER(ARRAY(c_double, 26)), POINTER(ARRAY(c_double, 13)), c_int32,
-                                       c_int32, c_float, c_int32]
-    dll.fit_classification.restype = c_double
+    modelClassif = CLib.create_linear_model(inputCountPerSample)
 
-    modelclass = dll.fit_classification(linear_model, xtrain, ytrain, samplecount, inputcountpersample, alpha, epochs)
+    print("\nBefore Classification : ")
+    CLib.displayMatrix(modelClassif, 1, inputCountPerSample + 1)
+    trainedModelClassif = CLib.fit_classification(modelClassif, X, Y, 0.001, 5000)
+    print("After Classification : ")
+    CLib.displayMatrix(trainedModelClassif, 1, inputCountPerSample + 1)
 
-    # dll.predict_regression.argtypes = [c_void_p, POINTER(ARRAY(c_double, 2)), c_int32]
-    # dll.predict_regression.restype = c_double
-    # result = dll.predict_regression(modelclass, inputtest, 2)
+    CLib.launchClassificationText(trainedModelClassif, [0.25, 0.25], -1)
+    CLib.launchClassificationText(trainedModelClassif, [2.5, 2.5], 1)
+    CLib.launchClassificationText(trainedModelClassif, [1, 2], 1)
+    CLib.launchClassificationText(trainedModelClassif, [0.3, 0.3], -1)
+    CLib.launchClassificationText(trainedModelClassif, [3, 3], 1)
 
-    # print(modelclass)
-    # print(result)
+    #
+    #
+    #
 
+    modelReg = CLib.create_linear_model(inputCountPerSample)
+
+    print("\nBefore Regression : ")
+    CLib.displayMatrix(modelReg, 1, inputCountPerSample + 1)
+    trainedModelReg = CLib.fit_regression(modelReg, X, Y)
+    print("After Regression : ")
+    CLib.displayMatrix(trainedModelReg, 1, inputCountPerSample + 1)
+
+    CLib.launchRegressionText(trainedModelReg, [0, 0], -1)
+    CLib.launchRegressionText(trainedModelReg, [2.5, 2.5], 1)
+    CLib.launchRegressionText(trainedModelReg, [1.5, 1.5], 1)
+    CLib.launchRegressionText(trainedModelReg, [0.3, 0.3], -1)
+    CLib.launchRegressionText(trainedModelReg, [3, 3], 1)
 
 if __name__ == "__main__":
     main()
