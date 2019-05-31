@@ -355,6 +355,8 @@ int main() {
         }
         std::cout << "\n";
     }
+
+    destroy(mlp);
 }
 
 
