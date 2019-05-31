@@ -38,7 +38,7 @@ puis pour compiler le fichier .cpp avec ses dépendances :
 * Windows : 
 
 ```bash
-?
+g++ -c Rosenblatt.cpp && g++ -shared -o Rosenblatt.dll Rosenblatt.o -W
 ```
 
 * Mac : 
