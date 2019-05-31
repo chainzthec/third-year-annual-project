@@ -19,14 +19,20 @@ def main():
 
     Y = [1, -1, -1, 1]
 
-    inputCountPerSample = int(len(X) / len(Y))
-    sampleCount = int(len(Y))
-
     mlp = CLib.init(N)
+    mlp = CLib.fit(mlp, X, Y, epochs, alpha)
 
-    # mlp = CLib.fit(mlp, XTrainFinal, YTrainFinal, sampleCount, inputCountPerSample, epochs, alpha)
+    predictions = CLib.predict(mlp, [0, 0], N)
+    print(predictions)
 
-    # predictions = CLib.predict(mlp, [0, 0])
+    predictions = CLib.predict(mlp, [1, 0], N)
+    print(predictions)
+
+    predictions = CLib.predict(mlp, [0, 1], N)
+    print(predictions)
+
+    predictions = CLib.predict(mlp, [1, 1], N)
+    print(predictions)
 
 
 if __name__ == "__main__":

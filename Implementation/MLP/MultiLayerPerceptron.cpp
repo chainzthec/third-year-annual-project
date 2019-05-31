@@ -34,7 +34,7 @@ SUPEREXPORT double getRand(double min, double max) {
     return val;
 }
 
-SUPEREXPORT double* create_linear_model(int inputCountPerSample) {
+SUPEREXPORT double* init_with_random(int inputCountPerSample) {
     auto res = new double[inputCountPerSample + 1];
 
     for (int i = 0; i < inputCountPerSample + 1; i++) {
@@ -93,17 +93,21 @@ SUPEREXPORT double** convertToMatrix(const double* XTrain, int ligne, int col){
 // MLP ALGORITHM
 
 SUPEREXPORT void init_model(MLP* mlp){
+
+//    std::cout << "mlp2: " << mlp << std::endl;
     mlp->W = new double**[mlp->layer_count];
 
     for (int l = 1; l < mlp->layer_count; ++l) {
         int prev_neuron_count = mlp->npl[l - 1] + 1; // +1 pour le biais
-        int cur_neuron_count = mlp->npl[l] + 1;
+        int cur_neuron_count = mlp->npl[l] + 1; // +1 pour le biais
 
         mlp->W[l] = new double*[prev_neuron_count];
 
-        for (int j = 0; j < prev_neuron_count; ++j) {
+//        std::cout << "prev_neuron_count: " << prev_neuron_count << std::endl;
+
+        for (int j = 0; j < prev_neuron_count; ++j) { // HERE
             mlp->W[l][j] = new double[cur_neuron_count];
-            mlp->W[l][j] = create_linear_model(cur_neuron_count);
+            mlp->W[l][j] = init_with_random(cur_neuron_count);
         }
     }
 }
@@ -180,7 +184,7 @@ SUPEREXPORT void updateW(MLP* mlp, int lastIndex, double alpha){
 }
 
 SUPEREXPORT void displayAllWValues(MLP* mlp){
-//  PRINT ALL W
+    //  PRINT ALL W
     for (int l = 1; l < mlp->layer_count; ++l) {
         int prev_neuron_count = mlp->npl[l - 1] + 1; // +1 pour le biais
         int cur_neuron_count = mlp->npl[l] + 1;
@@ -194,7 +198,7 @@ SUPEREXPORT void displayAllWValues(MLP* mlp){
 }
 
 SUPEREXPORT void displayAllXValues(MLP* mlp){
-//  PRINT ALL X
+    //  PRINT ALL X
     for (int l = 0; l < mlp->layer_count; ++l) {
 //        std::cout << "x[" << l << "] : ";
         for (int j = 0; j < mlp->npl[l] + 1; ++j) {
@@ -207,7 +211,7 @@ SUPEREXPORT void displayAllXValues(MLP* mlp){
 }
 
 SUPEREXPORT void displayAllDeltaValues(MLP* mlp){
-//  PRINT ALL Deltas
+    //  PRINT ALL Deltas
     for (int l = 0; l < mlp->layer_count; ++l) {
 //    std::cout << "delta[" << l << "] : ";
         for (int j = 0; j < mlp->npl[l] + 1; ++j) {
@@ -219,17 +223,19 @@ SUPEREXPORT void displayAllDeltaValues(MLP* mlp){
     std::cout << std::endl;
 }
 
-SUPEREXPORT double* predict(MLP* mlp ,double* XtoPred1, int inputCountPerSample){
-    std::cout << "-----------------" << std::endl;
-    mlp->X[0] = addBias(XtoPred1, inputCountPerSample);
+SUPEREXPORT double* predict(MLP* mlp, double* XtoPred, int inputCountPerSample){
+//    std::cout << "------- Test -------" << std::endl;
+
+    double* XtoPredWithBias = addBias(XtoPred, inputCountPerSample);
+    mlp->X[0] = XtoPredWithBias;
     feedFoward(mlp);
-    displayAllXValues(mlp);
+//    displayAllXValues(mlp);
 
-    int size = mlp->npl[mlp->lastLayerIndex];
-    auto* res = new double[size];
+    int npl = mlp->npl[mlp->lastLayerIndex];
+    auto* res = new double[npl];
 
-    for (int i = 0; i < size; ++i) {
-        res[i] = mlp->X[size][i+1];
+    for (int i = 0; i < npl; ++i) {
+        res[i] = mlp->X[mlp->lastLayerIndex][i+1];
     }
 
     return res;
@@ -247,14 +253,18 @@ SUPEREXPORT MLP* create_MLP() {
     return ret;
 }
 
-SUPEREXPORT MLP* init(int* neurons, int size){
+SUPEREXPORT MLP* init(const int* neurons, int size){
 
     srand(time(nullptr));
 
     MLP* mlp = create_MLP();
 
     mlp->layer_count = size;
-    mlp->npl = neurons;
+    mlp->npl = (int*) malloc(sizeof(int) * size);
+
+    for (int i = 0; i < size; ++i) {
+        mlp->npl[i] = neurons[i];
+    }
 
     mlp->X = new double*[size];
     mlp->deltas = new double*[size];
@@ -275,6 +285,11 @@ SUPEREXPORT MLP* fit(MLP* mlp, double* XTrain, double* YTrain, int sampleCount, 
 
 //    displayAllXValues(mlp);
 //    displayAllWValues(mlp);
+
+    for (int j = 0; j < 3; ++j) {
+        std::cout << mlp->npl[j] << " - ";
+    }
+    std::cout << std::endl;
 
     for (int e = 0; e < epochs; ++e) {
         for (int i = 0; i < sampleCount; ++i) {
@@ -326,35 +341,35 @@ int main() {
     double XtoPred1[2] = {0, 0};
     predict(mlp, XtoPred1, inputCountPerSample);
 
-    double XtoPred2[2] = {1, 0};
-    predict(mlp, XtoPred2, inputCountPerSample);
-
-    double XtoPred3[2] = {0, 1};
-    predict(mlp, XtoPred3, inputCountPerSample);
-
-    double XtoPred4[2] = {1, 1};
-    predict(mlp, XtoPred4, inputCountPerSample);
+//    double XtoPred2[2] = {1, 0};
+//    predict(mlp, XtoPred2, inputCountPerSample);
+//
+//    double XtoPred3[2] = {0, 1};
+//    predict(mlp, XtoPred3, inputCountPerSample);
+//
+//    double XtoPred4[2] = {1, 1};
+//    predict(mlp, XtoPred4, inputCountPerSample);
 //
 //    std::cout << "-------------------" << std::endl;
 //    displayAllWValues(&mlp);
 
-    for (double i = 1; i >= -0.05; i-=0.05) {
-
-        printf("%4.2f > ", i);
-        for (double j = 0; j <= 1.05; j+=0.05) {
-
-            double XtoPred[3] = {1, i, j};
-            (mlp)->X[0] = XtoPred;
-            feedFoward(mlp);
-
-            if( (mlp)->X[( (mlp)->lastLayerIndex )][1] > 0 )
-                std::cout << " x ";
-            else
-                std::cout << " - ";
-
-        }
-        std::cout << "\n";
-    }
+//    for (double i = 1; i >= -0.05; i-=0.05) {
+//
+//        printf("%4.2f > ", i);
+//        for (double j = 0; j <= 1.05; j+=0.05) {
+//
+//            double XtoPred[3] = {1, i, j};
+//            (mlp)->X[0] = XtoPred;
+//            feedFoward(mlp);
+//
+//            if( (mlp)->X[( (mlp)->lastLayerIndex )][1] > 0 )
+//                std::cout << " x ";
+//            else
+//                std::cout << " - ";
+//
+//        }
+//        std::cout << "\n";
+//    }
 
     destroy(mlp);
 }
