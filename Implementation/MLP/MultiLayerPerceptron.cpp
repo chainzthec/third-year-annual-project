@@ -129,7 +129,6 @@ SUPEREXPORT void feedFoward(MLP* mlp){
     }
 }
 
-
 SUPEREXPORT double sommWxDelta(const double* w, int cur_neuron_count, const double* delta){
     double res = 0;
     for (int j = 1; j < cur_neuron_count; j++) {
@@ -138,7 +137,7 @@ SUPEREXPORT double sommWxDelta(const double* w, int cur_neuron_count, const doub
     return res;
 }
 
-SUPEREXPORT void initAllDeltaExeptLast(MLP* mlp, int lastIndex){
+SUPEREXPORT void initAllDeltaExceptLast(MLP* mlp, int lastIndex){
     for (int l = lastIndex; l > 0 ; l--) {
         int prev_neuron_count = mlp->npl[l - 1] + 1;
         int cur_neuron_count = mlp->npl[l] + 1;
@@ -220,10 +219,39 @@ SUPEREXPORT void displayAllDeltaValues(MLP* mlp){
     std::cout << std::endl;
 }
 
-SUPEREXPORT MLP init_mlp(int neurons[], int size) {
-    MLP m = {};
-    MLP* mlp;
-    mlp = &m;
+SUPEREXPORT double* predict(MLP* mlp ,double* XtoPred1, int inputCountPerSample){
+    std::cout << "-----------------" << std::endl;
+    mlp->X[0] = addBias(XtoPred1, inputCountPerSample);
+    feedFoward(mlp);
+    displayAllXValues(mlp);
+
+    int size = mlp->npl[mlp->lastLayerIndex];
+    auto* res = new double[size];
+
+    for (int i = 0; i < size; ++i) {
+        res[i] = mlp->X[size][i+1];
+    }
+
+    return res;
+}
+
+SUPEREXPORT MLP* create_MLP() {
+    auto* ret = (struct MLP*) malloc(sizeof(struct MLP));
+    ret->X = new double*;
+    ret->npl = new int;
+    ret->lastLayerIndex = 0;
+    ret->deltas = new double*;
+    ret->layer_count = 0;
+    ret->W = new double**;
+
+    return ret;
+}
+
+SUPEREXPORT MLP* init(int* neurons, int size){
+
+    srand(time(nullptr));
+
+    MLP* mlp = create_MLP();
 
     mlp->layer_count = size;
     mlp->npl = neurons;
@@ -231,23 +259,19 @@ SUPEREXPORT MLP init_mlp(int neurons[], int size) {
     mlp->X = new double*[size];
     mlp->deltas = new double*[size];
 
-    return *mlp;
-}
-
-SUPEREXPORT void predict(MLP* mlp ,double* XtoPred1, int inputCountPerSample){
-    std::cout << "-----------------" << std::endl;
-    mlp->X[0] = addBias(XtoPred1, inputCountPerSample);
-    feedFoward(mlp);
-    displayAllXValues(mlp);
-}
-
-SUPEREXPORT MLP fit(int* neurons, int size, double** xTrainFinal, double** YTrainFinal, int sampleCount, int epochs, double alpha){
-    MLP mlp_pointer = init_mlp(neurons, size);
-    MLP *mlp = &mlp_pointer;
-
     init_model(mlp);
 
     mlp->lastLayerIndex = mlp->layer_count - 1;
+
+    return mlp;
+}
+
+SUPEREXPORT MLP* fit(MLP* mlp, double* XTrain, double* YTrain, int sampleCount, int inputCountPerSample, int epochs, double alpha) {
+
+    double** XTrainFinal = convertToMatrix(XTrain, sampleCount, inputCountPerSample);
+    XTrainFinal = addMatrixBias(XTrainFinal, sampleCount, inputCountPerSample);
+
+    double** YTrainFinal = convertToMatrix(YTrain, sampleCount, 1);
 
 //    displayAllXValues(mlp);
 //    displayAllWValues(mlp);
@@ -255,25 +279,29 @@ SUPEREXPORT MLP fit(int* neurons, int size, double** xTrainFinal, double** YTrai
     for (int e = 0; e < epochs; ++e) {
         for (int i = 0; i < sampleCount; ++i) {
 
-            mlp->X[0] = xTrainFinal[i];
+            mlp->X[0] = XTrainFinal[i];
             feedFoward(mlp);
 
             initLastDelta_classification(mlp, mlp->lastLayerIndex, YTrainFinal[i]);
-            initAllDeltaExeptLast(mlp, mlp->lastLayerIndex);
+            initAllDeltaExceptLast(mlp, mlp->lastLayerIndex);
             updateW(mlp, mlp->lastLayerIndex, alpha);
         }
     }
 
 //    std::cout << "Debug 1 : " << &mlp << " LayerCount: " << mlp->layer_count << std::endl;
 
-    return *mlp;
+    return mlp;
+}
+
+SUPEREXPORT void destroy(struct MLP* mlp) {
+    if( mlp ){
+        free( mlp );
+    }
 }
 
 int main() {
 
     // Init
-
-    srand(time(nullptr));
 
     int sampleCount = 4;
     int inputCountPerSample = 2;
@@ -288,61 +316,26 @@ int main() {
     };
     double YTrain[4] = {1, -1, -1, 1};
 
-    auto xTrainFinal = convertToMatrix(XTrain, sampleCount, inputCountPerSample);
-    xTrainFinal = addMatrixBias(xTrainFinal, sampleCount, inputCountPerSample);
-
-    auto YTrainFinal = convertToMatrix(YTrain, sampleCount, 1);
-
-//    for (int i = 0; i < sampleCount; ++i) {
-//        for (int j = 0; j < 1; ++j) {
-//            std::cout << YTrainFinal[i][j] << " - ";
-//        }
-//        std::cout << std::endl;
-//    }
-
     // MLP implemtation
 
     int neurons[3] = {2, 2, 1};
+    MLP* mlp = init(neurons, 3);
 
-    MLP mlp = fit(neurons, 3, xTrainFinal, YTrainFinal, sampleCount, epochs, alpha);
-
-//    std::cout << "Debug 2 : " << &mlp << " LayerCount: " << (&mlp)->layer_count << std::endl;
-
-//    MLP mlp_pointer = init_mlp(neurons, 3);
-//    MLP *mlp = &mlp_pointer;
-//
-//    init_model(mlp);
-//
-//    int lastLayerIndex = mlp->layer_count - 1;
-//
-////    displayAllXValues(mlp);
-////    displayAllWValues(mlp);
-//
-//    for (int e = 0; e < epochs; ++e) {
-//        for (int i = 0; i < sampleCount; ++i) {
-//
-//            mlp->X[0] = xTrainFinal[i];
-//            feedFoward(mlp);
-//
-//            initLastDelta_classification(mlp, mlp->lastLayerIndex, YTrainFinal[i]);
-//            initAllDeltaExeptLast(mlp, mlp->lastLayerIndex);
-//            updateW(mlp, mlp->lastLayerIndex, alpha);
-//        }
-//    }
+    mlp = fit(mlp, XTrain, YTrain, sampleCount, inputCountPerSample, epochs, alpha);
 
     double XtoPred1[2] = {0, 0};
-    predict(&mlp, XtoPred1, inputCountPerSample);
+    predict(mlp, XtoPred1, inputCountPerSample);
 
     double XtoPred2[2] = {1, 0};
-    predict(&mlp, XtoPred2, inputCountPerSample);
+    predict(mlp, XtoPred2, inputCountPerSample);
 
     double XtoPred3[2] = {0, 1};
-    predict(&mlp, XtoPred3, inputCountPerSample);
+    predict(mlp, XtoPred3, inputCountPerSample);
 
     double XtoPred4[2] = {1, 1};
-    predict(&mlp, XtoPred4, inputCountPerSample);
-
-    std::cout << "-------------------" << std::endl;
+    predict(mlp, XtoPred4, inputCountPerSample);
+//
+//    std::cout << "-------------------" << std::endl;
 //    displayAllWValues(&mlp);
 
     for (double i = 1; i >= -0.05; i-=0.05) {
@@ -351,10 +344,10 @@ int main() {
         for (double j = 0; j <= 1.05; j+=0.05) {
 
             double XtoPred[3] = {1, i, j};
-            (&mlp)->X[0] = XtoPred;
-            feedFoward(&mlp);
+            (mlp)->X[0] = XtoPred;
+            feedFoward(mlp);
 
-            if((&mlp)->X[((&mlp)->lastLayerIndex)][1] > 0)
+            if( (mlp)->X[( (mlp)->lastLayerIndex )][1] > 0 )
                 std::cout << " x ";
             else
                 std::cout << " - ";
