@@ -38,7 +38,7 @@ puis pour compiler le fichier .cpp avec ses dépendances :
 * Windows : 
 
 ```bash
-?
+g++ -c Rosenblatt.cpp && g++ -shared -o Rosenblatt.dll Rosenblatt.o -W
 ```
 
 * Mac : 
@@ -60,7 +60,7 @@ g++ -shared -Wl -o Librairie/Linux/Rosenblatt_Linux.so Librairie/Linux/Rosenblat
 * Windows : 
 
 ```bash
-?
+g++ -c MultiLayerPerceptron.cpp && g++ -shared -o MultiLayerPerceptron.dll MultiLayerPerceptron.o -W
 ```
 
 * Mac :  
