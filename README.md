@@ -60,7 +60,7 @@ g++ -shared -Wl -o Librairie/Linux/Rosenblatt_Linux.so Librairie/Linux/Rosenblat
 * Windows : 
 
 ```bash
-g++ -c MultiLayerPerceptron.cpp && g++ -shared -o MultiLayerPerceptron.dll MultiLayerPerceptron.o -W
+g++ -c MultiLayerPerceptron.cpp && g++ -shared -o Librairie/Windows/MultiLayerPerceptron_Windows.dll Librairie/Windows/MultiLayerPerceptron_Windows.o -W
 ```
 
 * Mac :  
