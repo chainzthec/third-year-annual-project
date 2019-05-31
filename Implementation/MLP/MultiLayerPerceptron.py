@@ -22,10 +22,9 @@ def main():
     inputCountPerSample = int(len(X) / len(Y))
     sampleCount = int(len(Y))
 
-    XTrainFinal = CLib.init_XTrain(X, sampleCount, inputCountPerSample)
-    YTrainFinal = CLib.init_YTrain(Y, sampleCount)
+    mlp = CLib.init(N)
 
-    mlp = CLib.fit(N, XTrainFinal, YTrainFinal, sampleCount, epochs, alpha)
+    # mlp = CLib.fit(mlp, XTrainFinal, YTrainFinal, sampleCount, inputCountPerSample, epochs, alpha)
 
     # predictions = CLib.predict(mlp, [0, 0])
 

@@ -342,22 +342,22 @@ int main() {
 
     // Regression
 
-//    std::cout << std::endl << std::endl;
-//    std::cout << ">> Graphe Regression :";
-//    std::cout << std::endl << std::endl;
-//
-//    for (double i = 2; i >= -0.05; i-=0.05) {
-//        printf("%4.2f | ", i < 0 ? 0 : i );
-//        for (double j = 0; j <= 2.05; j+=0.05) {
-//            double value[2] = {i, j};
-//            if(predict_regression(model2, value, 2) == 1){
-//                std::cout << " - ";
-//            }else{
-//                std::cout << " x ";
-//            }
-//        }
-//        std::cout << std::endl;
-//    }
+    std::cout << std::endl << std::endl;
+    std::cout << ">> Graphe Regression :";
+    std::cout << std::endl << std::endl;
+
+    for (double i = 2; i >= -0.05; i-=0.05) {
+        printf("%4.2f | ", i < 0 ? 0 : i );
+        for (double j = 0; j <= 2.05; j+=0.05) {
+            double value[2] = {i, j};
+            if(predict_regression(model2, value, 2) == 1){
+                std::cout << " - ";
+            }else{
+                std::cout << " x ";
+            }
+        }
+        std::cout << std::endl;
+    }
 
 
 }
