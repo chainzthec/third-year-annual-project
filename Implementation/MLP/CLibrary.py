@@ -4,9 +4,9 @@
 
 from ctypes import *
 
-myDll = cdll.LoadLibrary("./MultiLayerPerceptron_Mac.so")
-# myDll = cdll.LoadLibrary("./MultiLayerPerceptron_Linux.so")
-# myDll = cdll.LoadLibrary("./MultiLayerPerceptron_Windows.dll")
+myDll = cdll.LoadLibrary("./Librairie/Mac/MultiLayerPerceptron_Mac.so")  # For Mac
+# myDll = cdll.LoadLibrary("./Librairie/Linux/MultiLayerPerceptron_Linux.so")  # For Linux
+# myDll = cdll.LoadLibrary("./Librairie/Windows/MultiLayerPerceptron_Windows.dll")  # For Windows
 
 
 def init(neurons):

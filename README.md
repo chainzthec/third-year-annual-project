@@ -44,15 +44,15 @@ puis pour compiler le fichier .cpp avec ses dépendances :
 * Mac : 
 
 ```bash
-g++ -c -std=c++17 Rosenblatt.cpp -o Rosenblatt_Mac.o && 
-g++ -shared -Wl -o Rosenblatt_Mac.so Rosenblatt_Mac.o
+g++ -c -std=c++17 Rosenblatt.cpp -o Librairie/Mac/Rosenblatt_Mac.o && 
+g++ -shared -Wl -o Librairie/Mac/Rosenblatt_Mac.so Librairie/Mac/Rosenblatt_Mac.o
 ```
 
 * Linux : 
 
 ```bash
-g++ -c -std=c++17 Rosenblatt.cpp -o Rosenblatt_Linux.o && 
-g++ -shared -Wl -o Rosenblatt_Linux.so Rosenblatt_Linux.o
+g++ -c -std=c++17 Rosenblatt.cpp -o Librairie/Linux/Rosenblatt_Linux.o && 
+g++ -shared -Wl -o Librairie/Linux/Rosenblatt_Linux.so Librairie/Linux/Rosenblatt_Linux.o
 ```
 
 #### MLP : 
@@ -66,15 +66,15 @@ g++ -shared -Wl -o Rosenblatt_Linux.so Rosenblatt_Linux.o
 * Mac :  
 
 ```bash
-g++ -c -std=c++17 MultiLayerPerceptron.cpp -o MultiLayerPerceptron_Mac.o && 
-g++ -shared -Wl -o MultiLayerPerceptron_Mac.so MultiLayerPerceptron_Mac.o
+g++ -c -std=c++17 MultiLayerPerceptron.cpp -o Librairie/Mac/MultiLayerPerceptron_Mac.o && 
+g++ -shared -Wl -o Librairie/Mac/MultiLayerPerceptron_Mac.so Librairie/Mac/MultiLayerPerceptron_Mac.o
 ```
 
 * Linux :  
 
 ```bash
-g++ -c -std=c++17 MultiLayerPerceptron.cpp -o MultiLayerPerceptron_Linux.o && 
-g++ -shared -Wl -o MultiLayerPerceptron_Linux.so MultiLayerPerceptron_Linux.o
+g++ -c -std=c++17 MultiLayerPerceptron.cpp -o Librairie/Linux/MultiLayerPerceptron_Linux.o && 
+g++ -shared -Wl -o Librairie/Linux/MultiLayerPerceptron_Linux.so Librairie/Linux/MultiLayerPerceptron_Linux.o
 ```
 
 #### Librairie C + Python 

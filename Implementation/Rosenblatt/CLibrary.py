@@ -4,7 +4,9 @@
 
 from ctypes import *
 
-myDll = cdll.LoadLibrary("./Rosenblatt.so")
+myDll = cdll.LoadLibrary("./Librairie/Mac/Rosenblatt_Mac.so")  # For Mac
+# myDll = cdll.LoadLibrary("./Librairie/Linux/Rosenblatt_Linux.so")  # For Linux
+# myDll = cdll.LoadLibrary("./Librairie/Windows/Rosenblatt_Windows.dll")  # For Windows
 
 
 def create_linear_model(inputCountPerSample):
