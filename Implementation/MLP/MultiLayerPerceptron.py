@@ -19,8 +19,10 @@ def main():
 
     Y = [1, -1, -1, 1]
 
+    sampleCount = int(len(X) - len(Y))
+
     mlp = CLib.init(N)
-    mlp = CLib.fit_classification(mlp, X, Y, epochs, alpha)
+    mlp = CLib.fit_classification(mlp, X, Y, sampleCount, epochs, alpha)
 
     predictions = CLib.predict(mlp, [0, 0], N)
     print(predictions)
