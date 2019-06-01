@@ -42,28 +42,24 @@ def fit_classification(mlp, XTrain, YTrain, sampleCount, epochs, alpha):
     return myDll.fit_classification(mlp, XTrainFinal, YTrainFinal, sampleCount, epochs, alpha)
 
 
-# def fit_regression(mlp, XTrain, YTrain, epochs, alpha):
-#
-#     lenX = len(XTrain)
-#     lenY = len(YTrain)
-#     XTrainFinal = (c_double * lenX)(*XTrain)
-#     YTrainFinal = (c_double * lenY)(*YTrain)
-#
-#     sampleCounts = int(lenX - lenY)
-#     inputCountPerSample = int(lenX / lenY)
-#
-#     myDll.fit_regression.argtypes = [
-#         c_void_p,
-#         POINTER(ARRAY(c_double, lenX)),
-#         POINTER(ARRAY(c_double, lenY)),
-#         c_int32,
-#         c_int32,
-#         c_int32,
-#         c_double
-#     ]
-#
-#     myDll.fit_regression.restype = c_void_p
-#     return myDll.fit_regression(mlp, XTrainFinal, YTrainFinal, sampleCounts, inputCountPerSample, epochs, alpha)
+def fit_regression(mlp, XTrain, YTrain, sampleCount, epochs, alpha):
+
+    lenX = len(XTrain)
+    lenY = len(YTrain)
+    XTrainFinal = (c_double * lenX)(*XTrain)
+    YTrainFinal = (c_double * lenY)(*YTrain)
+
+    myDll.fit_regression.argtypes = [
+        c_void_p,
+        POINTER(ARRAY(c_double, lenX)),
+        POINTER(ARRAY(c_double, lenY)),
+        c_int32,
+        c_int32,
+        c_double
+    ]
+
+    myDll.fit_regression.restype = c_void_p
+    return myDll.fit_regression(mlp, XTrainFinal, YTrainFinal, sampleCount, epochs, alpha)
 
 
 def predict(mlp, xToPredict, N):
