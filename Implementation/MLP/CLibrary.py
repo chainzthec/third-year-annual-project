@@ -4,15 +4,17 @@
 
 from ctypes import *
 
-myDll = cdll.LoadLibrary("./MultiLayerPerceptron.so")
+myDll = cdll.LoadLibrary("./Librairie/Mac/MultiLayerPerceptron_Mac.so")  # For Mac
+# myDll = cdll.LoadLibrary("./Librairie/Linux/MultiLayerPerceptron_Linux.so")  # For Linux
+# myDll = cdll.LoadLibrary("./Librairie/Windows/MultiLayerPerceptron_Windows.dll")  # For Windows
 
 
 def init(neurons):
     neuronSize = len(neurons)
-    neuronPointer = (c_double * neuronSize)(*neurons)
+    neuronPointer = (c_int32 * neuronSize)(*neurons)
 
     myDll.init.argtypes = [
-        POINTER(ARRAY(c_double, neuronSize)),
+        POINTER(ARRAY(c_int32, neuronSize)),
         c_int32
     ]
 
@@ -20,34 +22,54 @@ def init(neurons):
     return myDll.init(neuronPointer, neuronSize)
 
 
-# def fit(neurons, XTrainFinal, YTrainFinal, sampleCounts, epochs, alpha):
-#
-#     neuronSize = len(neurons)
-#     neuronPointer = (c_double * neuronSize)(*neurons)
-#
-#     myDll.fit.argtypes = [
-#         POINTER(ARRAY(c_double, neuronSize)),
-#         c_int32,
-#         c_void_p,
-#         c_void_p,
-#         c_int32,
-#         c_int32,
-#         c_double
-#     ]
-#
-#     myDll.fit.restype = c_void_p
-#     return myDll.fit(neuronPointer, neuronSize, XTrainFinal, YTrainFinal, sampleCounts, epochs, alpha)
-#
-#
-# def predict(mlp, xToPredict):
-#     inputCountPerSample = len(xToPredict)
-#     pointr = (c_double * inputCountPerSample)(*xToPredict)
-#
-#     myDll.predict.argtypes = [
-#         c_void_p,
-#         POINTER(ARRAY(c_double, inputCountPerSample)),
-#         c_int32,
-#     ]
-#
-#     myDll.predict.restype = c_void_p
-#     return myDll.predict(mlp, pointr, inputCountPerSample)
+def fit_classification(mlp, XTrain, YTrain, sampleCount, epochs, alpha):
+
+    lenX = len(XTrain)
+    lenY = len(YTrain)
+    XTrainFinal = (c_double * lenX)(*XTrain)
+    YTrainFinal = (c_double * lenY)(*YTrain)
+
+    myDll.fit_classification.argtypes = [
+        c_void_p,
+        POINTER(ARRAY(c_double, lenX)),
+        POINTER(ARRAY(c_double, lenY)),
+        c_int32,
+        c_int32,
+        c_double
+    ]
+
+    myDll.fit_classification.restype = c_void_p
+    return myDll.fit_classification(mlp, XTrainFinal, YTrainFinal, sampleCount, epochs, alpha)
+
+
+def fit_regression(mlp, XTrain, YTrain, sampleCount, epochs, alpha):
+
+    lenX = len(XTrain)
+    lenY = len(YTrain)
+    XTrainFinal = (c_double * lenX)(*XTrain)
+    YTrainFinal = (c_double * lenY)(*YTrain)
+
+    myDll.fit_regression.argtypes = [
+        c_void_p,
+        POINTER(ARRAY(c_double, lenX)),
+        POINTER(ARRAY(c_double, lenY)),
+        c_int32,
+        c_int32,
+        c_double
+    ]
+
+    myDll.fit_regression.restype = c_void_p
+    return myDll.fit_regression(mlp, XTrainFinal, YTrainFinal, sampleCount, epochs, alpha)
+
+
+def predict(mlp, xToPredict, N):
+    pointr = (c_double * len(xToPredict))(*xToPredict)
+
+    myDll.predict.argtypes = [
+        c_void_p,
+        POINTER(ARRAY(c_double, len(xToPredict))),
+    ]
+
+    myDll.predict.restype = POINTER(c_int32)
+    predictions = myDll.predict(mlp, pointr)
+    return [predictions[i] for i in range(N[-1])]
