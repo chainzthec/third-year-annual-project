@@ -13,17 +13,20 @@
 #include <cmath>
 #include <iostream>
 #include <ctime>
-
+#include <Eigen/Dense>
 #include "../Librairie/Matrix.h"
+
+using namespace Eigen;
 
 extern "C" {
 
-SUPEREXPORT double getNormAbsValueOfXMinusXN(double *XTrain, double rows, double columns){
+SUPEREXPORT double getNormAbsValueOfXMinusXN(double *XTrain, int rows, int columns){
     double sum = 0;
     auto* phi = new double[rows * columns];
     for(int i = 0; i < rows; i++){
         for(int j = 0; j < columns; j++){
             phi[i+j] = abs(XTrain[i] - XTrain[j]) * abs(XTrain[i] - XTrain[j]);
+            std::cout << "Valeur de phi" << phi[i+j] << std::endl;
             sum += phi[i+j];
         }
     }
@@ -57,6 +60,8 @@ int main() {
     int sampleCount = 13;
     int epochs = 10;
     double gamma = 0.01;
+
+    MatrixXd m(2,13);
 
     double Xtrains[26] = {
             0, 0,
