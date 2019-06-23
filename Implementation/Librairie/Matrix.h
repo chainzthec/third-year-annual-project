@@ -942,7 +942,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-// Stream operator used to convert matrix class to a string.
+// Stream operator used to   matrix class to a string.
 //-----------------------------------------------------------------------------
 template< class TYPE >
 std::ostream & operator<<

@@ -13,79 +13,123 @@
 #include <cmath>
 #include <iostream>
 #include <ctime>
-#include <Eigen/Dense>
-#include "../Librairie/Matrix.h"
 
-using namespace Eigen;
+#include "../Librairie/Matrix.h"
 
 extern "C" {
 
-SUPEREXPORT double getNormAbsValueOfXMinusXN(double *XTrain, int rows, int columns){
-    double sum = 0;
-    auto* phi = new double[rows * columns];
-    for(int i = 0; i < rows; i++){
-        for(int j = 0; j < columns; j++){
-            phi[i+j] = abs(XTrain[i] - XTrain[j]) * abs(XTrain[i] - XTrain[j]);
-            std::cout << "Valeur de phi" << phi[i+j] << std::endl;
-            sum += phi[i+j];
+int main() {
+    double X[10] = {0.19503705,
+                      0.5114616 ,
+                      0.82267886,
+                      0.5032035 ,
+                      0.98414799,
+                      0.15712639,
+                      0.51985008,
+                      0.51160201,
+                      0.29984946,
+                      0.71015867};
+    double Y[] = { 0.53368513 };
+
+
+//    0.88006435,
+//    0.65887012,
+//    0.95164382,
+//    0.66102254,
+//    0.58562491,
+//    0.45204745,
+//    0.38493358,
+//    0.22059383,
+//    0.1615526
+
+    int epochs = 100;
+    double gamma = 0.01;
+    int rowsOfX = 10;
+    int colsOfX = 1;
+    int rowsOfY = 1;
+    int colsOfY = 1;
+
+    double phi[rowsOfX][colsOfX];
+
+    std::cout << "Nombre de colonnes pour X : " << rowsOfX << std::endl;
+    std::cout << "Nombre de lignes pour X : " << colsOfX << std::endl;
+    std::cout << "Nombre de colonnes pour Y : " << rowsOfY << std::endl;
+    std::cout << "Nombre de lignes pour Y : " << colsOfY << std::endl;
+
+    std::cout << "Affichage des donnees de X : " << std::endl;
+    for(int i = 0; i < rowsOfX; i++){
+        for(int j = 0; j < colsOfX; j++){
+            //std::cout << "X["<< i << "][" << j << "] =" << X[i] << std::endl;
+            std::cout << "X["<< i << "] = " << X[i] << std::endl;
         }
     }
-    return sum;
-}
 
-SUPEREXPORT double* fit_classification(
-        double* XTrain,
-        int sampleCount, // nombre d'image (ligne)
-        int inputCountPerSample, //nombre de pixel par img (colonne)
-        double gamma,
-        int epochs // Nombre d'itération
-) {
-    double currentWeight;
-    //somme de 1 à N
-    for(int i = 0; i < epochs; i++){
-        double absValueOfXMinusXN = exp((-gamma) * getNormAbsValueOfXMinusXN(XTrain, sampleCount, inputCountPerSample));
-        std::cout << "Exp value = " << absValueOfXMinusXN << std::endl;
-        //double* valueOfExponential = ;
-        //currentWeight = calcWeight(W);
+    std::cout << "Affichage des donnees de Y : " << std::endl;
+    for(int i = 0; i < rowsOfY; i++){
+        for(int j = 0; j < colsOfY; j++){
+            //std::cout << "X["<< i << "][" << j << "] =" << X[i] << std::endl;
+            std::cout << "Y["<< i << "] = " << Y[i] << std::endl;
+        }
     }
 
-    return nullptr;
-}
+    for(int i = 0; i < epochs; i++){
 
-int main() {
+        //build phi
+        for(int x = 0; x < rowsOfX; x++){
+            for(int j = 0; j < colsOfX; j++){
+                //phi[x][j] = exp(-gamma* (sqrt(X[x][j] * X[x][j] + X[x][j] * X[x][j])));
+                phi[x][j] = exp(-gamma* (sqrt(X[x] * X[x] + X[x] * X[x])));
+            }
+        }
 
-    srand(time(nullptr)); // Enable rand() function
+        double teta[rowsOfX][colsOfX];
+        for(int i = 0; i < rowsOfX;i++){
+            for(int j = 0; j < colsOfX;j++){
+                //teta[i][j] = exp(-gamma * (sqrt(X[i][j] * X[i][j] + X[i][j] * X[i][j])));
+                teta[i][j] = exp(-gamma * (sqrt(X[i] * X[i] + X[i] * X[i])));
+                std::cout << "Teta[" << i <<"]"<<"["<<j<<"] = "<< teta[i][j] << std::endl;
+            }
+        }
 
-    int inputCountPerSample = 2;
-    int sampleCount = 13;
-    int epochs = 10;
-    double gamma = 0.01;
+        Matrix<double> tetaMatrix(rowsOfX, colsOfX);
+        for (int i = 0; i < rowsOfX; ++i) {
+            for (int j = 0; j < colsOfX; ++j) {
+                tetaMatrix.put(i, j, teta[i][j]);
+            }
+        }
 
-    MatrixXd m(2,13);
+        Matrix<double> YMatrix(rowsOfY,colsOfY);
 
-    double Xtrains[26] = {
-            0, 0,
-            1, 0,
-            0, 1,
-            2, 2,
-            1, 2,
-            2, 1,
-            0.25, 0.25,
-            0.1, 0.1,
-            0.15, 0.15,
-            0.3, 0.3,
-            3, 3,
-            1.5, 1.5,
-            2.5, 2.5
-    };
-
-    // 13 car sampleCount = 13 (soit 13 images)
-    //double Ytrains[13] = {-1, 1, 1, 1, 1, 1, -1, -1, -1, -1, 1, 1, 1};
-
-    double * res = fit_classification(Xtrains,sampleCount,inputCountPerSample,gamma, epochs);
+        //Dimensions de la matrice teta et de la matrice Y
+        std::cout << "Dimensions de la matrice Teta : " << tetaMatrix.getRows() << "x" << tetaMatrix.getColumns() << std::endl;
+        std::cout << "Dimensions de la matrice Y : " << YMatrix.getRows() << "x" << YMatrix.getColumns() << std::endl;
 
 
+        Matrix<double> wn = tetaMatrix.getInverse() * YMatrix;
+        //double res[wn.getRows()][wn.getColumns()];
+        for(int i = 0 ; i < wn.getRows(); i++){
+            for(int j = 0; j < wn.getColumns(); j++){
+                //res[i][j] = wn.get(i,j);
+                std::cout << wn.get(i,j) << std::endl;
+            }
+        }
 
+        /*
+        for(int i = 0; i < wn.getRows(); i++){
+            for(int j = 0; j < wn.getColumns(); j++)
+            std::cout << "Resultat : " << res[i][j] << std::endl;
+        }
+         */
+
+
+        //double** teta = getTeta(gamma,X);
+        //double wn = (reverse(getTeta) * YTrain) * exp(-gamma * norm(minus(XTrainM[i],XTrainM[epochs])));
+
+
+        //exp(-gamma * norm(XTrain));
+        //res +=
+    }
+    
 }
 
 }

@@ -1,5 +1,6 @@
 from ctypes import *
 import numpy as np
+import matplotlib as mpl
 import platform as pf
 import subprocess
 	
