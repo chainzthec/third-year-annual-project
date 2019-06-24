@@ -3,10 +3,16 @@
 #
 
 from ctypes import *
+import platform as pf
 
-myDll = cdll.LoadLibrary("./Librairie/Mac/MultiLayerPerceptron_Mac.so")  # For Mac
-# myDll = cdll.LoadLibrary("./Librairie/Linux/MultiLayerPerceptron_Linux.so")  # For Linux
-# myDll = cdll.LoadLibrary("./Librairie/Windows/MultiLayerPerceptron_Windows.dll")  # For Windows
+osName = pf.system()
+
+if osName == "Darwin":
+    myDll = cdll.LoadLibrary("./Librairie/Mac/MultiLayerPerceptron_Mac.so")  # For Mac
+if osName == "Linux":
+    myDll = cdll.LoadLibrary("./Librairie/Linux/MultiLayerPerceptron_Linux.so")  # For Linux
+if osName == "Windows":
+    myDll = cdll.LoadLibrary("./Librairie/Windows/MultiLayerPerceptron_Windows.dll")  # For Windows
 
 
 def init(neurons):
