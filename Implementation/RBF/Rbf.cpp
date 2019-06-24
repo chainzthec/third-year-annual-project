@@ -45,12 +45,26 @@ RBF* initRBF(double *W, int inPutSize, int outPutSize){
 	return myRBF;
 }
 
-double distance(double* a, double *b,int size){
+
+double sign(double a){
+	if(a > 0){
+		return 1;
+	}
+	if(a == 0){
+		return 0;
+	}
+	if(a < 0){
+		return -1;
+	}
+}
+
+double distance(double** a, double **b,int size){
 	double d = 0;
-	for(int i = 0 ; i< size; i++){
-		
-			d = sqrt(pow((a[i] - b[i]), 2) + pow((a[i] - b[i]), 2) );	
-		
+	for(int i = 0 ; i< size-1; i++){
+		for(int j = 0 ; j< 1; j++){
+			//printf("a[%d][%d]:%f;b[%d+1][%d+1]:%f\n",a[i][j],b[i+1][j],i,j,i+1,j+1 );
+			d += sqrt(pow((a[i][j] - b[i+1][j]), 2) + pow((a[i][j+1] - b[i+1][j+1]), 2) );	
+		}
 	}
 	
 	return d;
@@ -69,23 +83,30 @@ Matrix<double> transformDoubleToMatrix(double *mat, int rows, int cols = 1) {
     return res;
 }
 
-double* RbfWeight(double *Ytrain, double* Xtrain, int sizeRbf,RBF* myRBF){
+double* RbfWeight(double *Ytrain, double** Xtrain, int sizeRbf,RBF* myRBF){
 
-	double* teta = new double [sizeRbf*sizeRbf];
-
-	for(int j = 0;j < sizeRbf*sizeRbf; j++ ){
+	double** teta = new double* [sizeRbf];
+	double* tetaToTran = new double[sizeRbf*sizeRbf];
+	for(int i = 0;i < sizeRbf; i++ ){
+		teta[i] = new double[sizeRbf];
 		
-			teta[j] = exp((-myRBF->gamma)*pow( distance(Xtrain,Xtrain,sizeRbf), 2));
+		for(int j = 0;j < sizeRbf; j++ ){
+		
+			teta[i][j] = exp((-myRBF->gamma)*pow( distance(Xtrain,Xtrain,sizeRbf), 2));
+			tetaToTran[i*sizeRbf+j] = teta[i][j];	
+				
 		}
+		printf("%f\n",distance(Xtrain,Xtrain,sizeRbf) );
+	}
 	
-	Matrix<double>tetaFin = transformDoubleToMatrix(teta, sizeRbf,sizeRbf);
+	Matrix<double>tetaFin = transformDoubleToMatrix(tetaToTran, sizeRbf,sizeRbf);
 	Matrix<double>YFin = transformDoubleToMatrix(Ytrain,sizeRbf,1);
 	Matrix<double>W = tetaFin.getInverse() * YFin;
 
 	return W.convertToDouble();
 }
 
-double regresRBF(double* Xtrain, double* W, RBF* myRBF, int sizeRbf){
+void regresRBF(double** Xtrain, double* W, RBF* myRBF, int sizeRbf){
 	
 	double res = 0.0;
 		for(int i = 0;i< sizeRbf; i++){
@@ -94,17 +115,31 @@ double regresRBF(double* Xtrain, double* W, RBF* myRBF, int sizeRbf){
 			}
 		}
 		
-return res;
+	myRBF->Wo[0] =  res;
+}
+
+void classifRBF(double** Xtrain, double* W, RBF* myRBF, int sizeRbf){
+	
+	double res = 0.0;
+		for(int i = 0;i< sizeRbf; i++){
+			for(int j = 0;j< sizeRbf; j++){
+				res += W[i]* exp((-myRBF->gamma)*pow((distance(Xtrain,Xtrain,sizeRbf)), 2));		
+			}
+		}
+	
+	myRBF->Wo[0] = sign(res);
 }
 
 
 int main (){
 //init XTrain
 //init YTrain
-	double XTrain[4][2] ;
+	double **XTrain = new double*[4];
+	for(int i = 0; i< 4;i++){
+		XTrain[i] = new double[2];
+	}
 	double YTrain[4][1];
 	
-
 	XTrain[0][0] = 0;
     XTrain[0][1] = 0;
 
@@ -129,11 +164,19 @@ int main (){
             0.5
     };
 
+   
+
    RBF* myRBF = initRBF(W, 4, 1);
-   double*newWeight = RbfWeight(*YTrain,*XTrain,4,myRBF);
-   double reg = regresRBF(*XTrain, newWeight, myRBF,4);
-   printf("%f\n",reg );  
+   double*newWeight = RbfWeight(*YTrain,XTrain,4,myRBF);
+   regresRBF(XTrain, newWeight, myRBF,4);
+   //classifRBF(XTrain, newWeight, myRBF,4);
+   printf("reg:%f\n",myRBF->Wo[0] );  
+   //printf("classif:%f\n",myRBF->Wo[0] );  
+
 
 return 0;
 }
+
+
+
 }
