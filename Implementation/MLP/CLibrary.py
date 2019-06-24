@@ -70,6 +70,6 @@ def predict(mlp, xToPredict, N):
         POINTER(ARRAY(c_double, len(xToPredict))),
     ]
 
-    myDll.predict.restype = POINTER(c_int32)
+    myDll.predict.restype = POINTER(c_double)
     predictions = myDll.predict(mlp, pointr)
     return [predictions[i] for i in range(N[-1])]
