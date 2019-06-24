@@ -43,7 +43,7 @@ int main() {
 //    0.1615526
 
     int epochs = 100;
-    double gamma = 0.01;
+    double gamma = 1;
     int rowsOfX = 10;
     int colsOfX = 1;
     int rowsOfY = 1;
@@ -105,14 +105,14 @@ int main() {
         std::cout << "Dimensions de la matrice Y : " << YMatrix.getRows() << "x" << YMatrix.getColumns() << std::endl;
 
 
-        Matrix<double> wn = tetaMatrix.getInverse() * YMatrix;
-        //double res[wn.getRows()][wn.getColumns()];
-        for(int i = 0 ; i < wn.getRows(); i++){
-            for(int j = 0; j < wn.getColumns(); j++){
-                //res[i][j] = wn.get(i,j);
-                std::cout << wn.get(i,j) << std::endl;
-            }
-        }
+        // Matrix<double> wn = tetaMatrix.getInverse() * YMatrix;
+        // //double res[wn.getRows()][wn.getColumns()];
+        // for(int i = 0 ; i < wn.getRows(); i++){
+        //     for(int j = 0; j < wn.getColumns(); j++){
+        //         //res[i][j] = wn.get(i,j);
+        //         std::cout << wn.get(i,j) << std::endl;
+        //     }
+        // }
 
         /*
         for(int i = 0; i < wn.getRows(); i++){
