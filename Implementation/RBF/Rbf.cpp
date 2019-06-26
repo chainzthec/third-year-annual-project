@@ -26,6 +26,7 @@ typedef struct sampleRBF{
 	
 	double* Wo;
 	double* Wi;
+	int sizeRbfOut;
 	//double lloydCenter;
 	double gamma;
 
@@ -35,7 +36,8 @@ RBF* initRBF(double *W, int inPutSize, int outPutSize){
 	RBF* myRBF = new RBF();
 	myRBF->Wi = new double[inPutSize];
 	myRBF->Wo = new double[outPutSize];
-	myRBF->gamma = 0.2;
+	myRBF->sizeRbfOut = outPutSize;
+	myRBF->gamma = 100;
 
 	for(int i = 0;i < inPutSize; i++){
 		
@@ -47,6 +49,7 @@ RBF* initRBF(double *W, int inPutSize, int outPutSize){
 
 
 double sign(double a){
+	
 	if(a > 0){
 		return 1;
 	}
@@ -58,15 +61,10 @@ double sign(double a){
 	}
 }
 
-double distance(double** a, double **b,int size){
-	double d = 0;
-	for(int i = 0 ; i< size-1; i++){
-		for(int j = 0 ; j< 1; j++){
-			//printf("a[%d][%d]:%f;b[%d+1][%d+1]:%f\n",a[i][j],b[i+1][j],i,j,i+1,j+1 );
-			d += sqrt(pow((a[i][j] - b[i+1][j]), 2) + pow((a[i][j+1] - b[i+1][j+1]), 2) );	
-		}
-	}
+double distance(point* a, point* b){
 	
+	double d = 0;
+	d += sqrt(pow((a->x - b->x), 2) + pow((a->y - b->y), 2) );	
 	return d;
 }
 
@@ -83,79 +81,101 @@ Matrix<double> transformDoubleToMatrix(double *mat, int rows, int cols = 1) {
     return res;
 }
 
-double* RbfWeight(double *Ytrain, double** Xtrain, int sizeRbf,RBF* myRBF){
+double* RbfWeight(double *Ytrain, point* Xtrain, int sizeRbf,RBF* myRBF){
 
-	double** teta = new double* [sizeRbf];
-	double* tetaToTran = new double[sizeRbf*sizeRbf];
+	double** phi = new double* [sizeRbf];
+	double* phiToTran = new double[sizeRbf*sizeRbf];
 	for(int i = 0;i < sizeRbf; i++ ){
-		teta[i] = new double[sizeRbf];
+
+		phi[i] = new double[sizeRbf];
 		
 		for(int j = 0;j < sizeRbf; j++ ){
 		
-			teta[i][j] = exp((-myRBF->gamma)*pow( distance(Xtrain,Xtrain,sizeRbf), 2));
-			tetaToTran[i*sizeRbf+j] = teta[i][j];	
-				
+			phi[i][j] = exp(-myRBF->gamma*pow( distance(&Xtrain[i],&Xtrain[j]), 2));
+			phiToTran[i*sizeRbf+j] = phi[i][j];	
+			printf("la%f\n" ,distance(&Xtrain[i],&Xtrain[j]) );
+
 		}
-		printf("%f\n",distance(Xtrain,Xtrain,sizeRbf) );
+		
 	}
 	
-	Matrix<double>tetaFin = transformDoubleToMatrix(tetaToTran, sizeRbf,sizeRbf);
+	Matrix<double>phiFin = transformDoubleToMatrix(phiToTran, sizeRbf,sizeRbf);
 	Matrix<double>YFin = transformDoubleToMatrix(Ytrain,sizeRbf,1);
-	Matrix<double>W = tetaFin.getInverse() * YFin;
+	Matrix<double>W = phiFin.getInverse() * YFin;
 
 	return W.convertToDouble();
 }
 
-void regresRBF(double** Xtrain, double* W, RBF* myRBF, int sizeRbf){
+void regresRBF(point* Xtrain, double* W, RBF* myRBF, int sizeRbf){
 	
-	double res = 0.0;
+	double res;
 		for(int i = 0;i< sizeRbf; i++){
 			for(int j = 0;j< sizeRbf; j++){
-				res += W[i]* exp((-myRBF->gamma)*pow((distance(Xtrain,Xtrain,sizeRbf)), 2));		
+			
+				res += W[i]* exp(-myRBF->gamma*pow((distance(&Xtrain[i],&Xtrain[1])), 2));
+				printf("%f\n",res );
 			}
 		}
 		
 	myRBF->Wo[0] =  res;
 }
 
-void classifRBF(double** Xtrain, double* W, RBF* myRBF, int sizeRbf){
+void classifRBF(point* Xtrain, double* W, RBF* myRBF, int sizeRbf){
 	
 	double res = 0.0;
 		for(int i = 0;i< sizeRbf; i++){
 			for(int j = 0;j< sizeRbf; j++){
-				res += W[i]* exp((-myRBF->gamma)*pow((distance(Xtrain,Xtrain,sizeRbf)), 2));		
+				res += W[i]* exp((-myRBF->gamma)*pow((distance(&Xtrain[i],&Xtrain[1])), 2));		
 			}
 		}
 	
 	myRBF->Wo[0] = sign(res);
 }
 
+void print(RBF *myRBF){
+	for(int i = 0; i < myRBF->sizeRbfOut; i++){
+		if(myRBF->Wo[i] == 1){
+			printf("*");		
+		
+	}else{
+		printf("/");
+	}
+}
+
+}
+double getRand(double min, double max) {
+    double val = (double) rand() / RAND_MAX;
+    val = min + val * (max - min);
+
+    return val;
+}
 
 int main (){
 //init XTrain
 //init YTrain
-	double **XTrain = new double*[4];
-	for(int i = 0; i< 4;i++){
-		XTrain[i] = new double[2];
-	}
+	point* XTrain = new point[4];
+	
 	double YTrain[4][1];
 	
-	XTrain[0][0] = 0;
-    XTrain[0][1] = 0;
+	XTrain[0].x = 0.13984698 ;
+    XTrain[0].y = 0.41485388;
 
-    XTrain[1][0] = 1;
-    XTrain[1][1] = 1;
+    XTrain[1].x = 0.28093573 ;
+    XTrain[1].y = 0.36177096;
 
-    XTrain[2][0] = 1;
-    XTrain[2][1] = 2;
+    XTrain[2].x = 0.25704393 ;
+    XTrain[2].y = 0.97695092;
 
-    XTrain[3][0] = 3;
-    XTrain[3][1] = 0;
+    XTrain[3].x = 0.05471647 ;
+    XTrain[3].y = 0.8640708;
 
-    YTrain[0][0] = 1;
-    YTrain[1][0] = -1;
-    YTrain[2][0] = 1;
-    YTrain[3][0] = 1;
+    YTrain[0][0] = 0.46119306;
+ 
+ 
+ 
+    YTrain[1][0] = 0.78636786;
+    YTrain[2][0] = 0.2617359 ;
+    YTrain[3][0] = 0.25985246;
 
     double W[4]{
             0.5,
@@ -172,11 +192,36 @@ int main (){
    //classifRBF(XTrain, newWeight, myRBF,4);
    printf("reg:%f\n",myRBF->Wo[0] );  
    //printf("classif:%f\n",myRBF->Wo[0] );  
+   print(myRBF);
 
 
 return 0;
 }
-
-
-
 }
+/*
+}
+
+[[0.13984698 0.41485388]
+[0.28093573 0.36177096]
+[0.25704393 0.97695092]
+[0.05471647 0.8640708 ]
+[0.91900274 0.95617945]
+[0.1753089 0.67689523]
+[0.25784674 0.12366917]
+[0.97495302 0.01277128]
+[0.08287882 0.94833339]
+[0.39418121 0.79789368]]
+
+[
+ 0.46119306
+ 0.78636786
+ 0.2617359 
+ 0.25985246
+ 0.28554652
+ 0.57842217
+ 0.35202585
+ 0.11248387
+ 0.72196561
+ 0.60782134
+ ]
+*/
