@@ -102,17 +102,17 @@ int main() {
      */
     /*
     double X[10][2] = {
-                    {0.13984698, 0.41485388},
-                    {0.28093573, 0.36177096},
-                    {0.25704393, 0.97695092},
-                    {0.05471647, 0.8640708},
-                    {0.91900274, 0.95617945},
-                    {0.1753089,  0.67689523},
-                    {0.25784674, 0.12366917},
-                    {0.97495302, 0.01277128},
-                    {0.08287882, 0.94833339},
-                    {0.39418121, 0.79789368}
-            };
+            {0.13984698, 0.41485388},
+            {0.28093573, 0.36177096},
+            {0.25704393, 0.97695092},
+            {0.05471647, 0.8640708},
+            {0.91900274, 0.95617945},
+            {0.1753089,  0.67689523},
+            {0.25784674, 0.12366917},
+            {0.97495302, 0.01277128},
+            {0.08287882, 0.94833339},
+            {0.39418121, 0.79789368}
+    };
 
     */
 
@@ -154,8 +154,8 @@ int main() {
         }
     }
     */
-    cout << "Affichage des donnees de X : " << XMatrix << endl;
-    cout << "Affichage des donnees de Y : " << YMatrix << endl;
+    //cout << "Affichage des donnees de X : " << XMatrix << endl;
+    //cout << "Affichage des donnees de Y : " << YMatrix << endl;
     /*
     cout << "Affichage des donnees de Y : " << endl;
     for (int i = 0; i < rowsOfY; i++) {
@@ -165,35 +165,39 @@ int main() {
     }
     */
 
-
-
     //build phi
-
 
     for (int i = 0; i < inputCountPerSample; i++) {
         for (int j = 0; j < inputCountPerSample; j++) {
             phi(i, j) = exp(-gamma * pow((XMatrix.row(i) - XMatrix.row(j)).norm(), 2));
-            cout << phi(i, j) << endl;
+            //cout << phi(i, j) << endl;
         }
     }
 
-    cout << phi << endl;
-    cout << phi.inverse() << endl;
-    MatrixXd W = MatrixXd(inputCountPerSample, inputCountPerSample);
+    double phiDoubleArray[20];
+    int x = 0;
+    for(int i = 0; i < inputCountPerSample; i++){
+        for(int j = 0; j < inputCountPerSample; j++){
+            phiDoubleArray[x] = phi(i,j);
+            x++;
+        }
+    }
 
-
-    W = phi.inverse() * YMatrix;
+    MatrixXd W = Map<MatrixXd>(phiDoubleArray, inputCountPerSample, inputCountPerSample);
 
     cout << W << endl;
 
-    //Dimensions de la matrice teta et de la matrice Y
-    cout << "Dimensions de la matrice Teta : " << phi.rows() << "x"
-         << phi.cols()
-         << endl;
-    cout << "Dimensions de la matrice Y : " << YMatrix.rows() << "x"
-         << YMatrix.cols()
-         << endl;
+    //MatrixXd W = phi.inverse() * YMatrix;
 
+    //cout << W << endl;
+
+    //Dimensions de la matrice teta et de la matrice Y
+    //cout << "Dimensions de la matrice Teta : " << phi.rows() << "x"
+    //     << phi.cols()
+    //    << endl;
+    //cout << "Dimensions de la matrice Y : " << YMatrix.rows() << "x"
+    //     << YMatrix.cols()
+    //    << endl;
 
     // Matrix<double> wn = tetaMatrix.getInverse() * YMatrix;
     // //double res[wn.getRows()][wn.getColumns()];
@@ -210,7 +214,6 @@ int main() {
         cout << "Resultat : " << res[i][j] << endl;
     }
      */
-
 
     //double** teta = getTeta(gamma,X);
     //double wn = (reverse(getTeta) * YTrain) * exp(-gamma * norm(minus(XTrainM[i],XTrainM[epochs])));
