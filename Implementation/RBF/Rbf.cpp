@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 
-#include "./Matrix.h"
+#include "../Librairie/Matrix.h"
 
 using std::vector;
 using std::cout;
