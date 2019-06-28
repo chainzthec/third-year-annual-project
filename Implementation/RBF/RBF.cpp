@@ -14,122 +14,241 @@
 #include <iostream>
 #include <ctime>
 
-#include "../Librairie/Matrix.h"
+#include "../Librairie/Eigen/Dense"
+#include "../Librairie/Eigen/Eigen"
+
+using namespace Eigen;
+using namespace std;
+
+/**
+ *
+ *
+ * X: [[0.13984698 0.41485388]
+ [0.28093573 0.36177096]
+ [0.25704393 0.97695092]
+ [0.05471647 0.8640708 ]
+ [0.91900274 0.95617945]
+ [0.1753089  0.67689523]
+ [0.25784674 0.12366917]
+ [0.97495302 0.01277128]
+ [0.08287882 0.94833339]
+ [0.39418121 0.79789368]]
+ Y: [0.46119306 0.78636786 0.2617359  0.25985246 0.28554652 0.57842217
+ 0.35202585 0.11248387 0.72196561 0.60782134]
+
+ value after predict for this dataset = 0.7863678645709891
+
+ */
 
 extern "C" {
 
-int main() {
-    double X[10] = {0.19503705,
-                      0.5114616 ,
-                      0.82267886,
-                      0.5032035 ,
-                      0.98414799,
-                      0.15712639,
-                      0.51985008,
-                      0.51160201,
-                      0.29984946,
-                      0.71015867};
-    double Y[] = { 0.53368513 };
+typedef struct RBF{
+    MatrixXd W;
+    MatrixXd X;
+    double* gamma;
+} RBF;
 
+RBF* initRBF(double* W, MatrixXd X, MatrixXd W, double gamma)
 
-//    0.88006435,
-//    0.65887012,
-//    0.95164382,
-//    0.66102254,
-//    0.58562491,
-//    0.45204745,
-//    0.38493358,
-//    0.22059383,
-//    0.1615526
-
-    int epochs = 100;
-    double gamma = 1;
-    int rowsOfX = 10;
-    int colsOfX = 1;
-    int rowsOfY = 1;
-    int colsOfY = 1;
-
-    double phi[rowsOfX][colsOfX];
-
-    std::cout << "Nombre de colonnes pour X : " << rowsOfX << std::endl;
-    std::cout << "Nombre de lignes pour X : " << colsOfX << std::endl;
-    std::cout << "Nombre de colonnes pour Y : " << rowsOfY << std::endl;
-    std::cout << "Nombre de lignes pour Y : " << colsOfY << std::endl;
-
-    std::cout << "Affichage des donnees de X : " << std::endl;
-    for(int i = 0; i < rowsOfX; i++){
-        for(int j = 0; j < colsOfX; j++){
-            //std::cout << "X["<< i << "][" << j << "] =" << X[i] << std::endl;
-            std::cout << "X["<< i << "] = " << X[i] << std::endl;
+void naive_rbf_train(RBF* rbf,double* X, double* Y,int inputCountPerSample, int sampleCount ,double gamma = 100,bool useBias = false){
+    double* res;
+    MatrixXd XMatrix = Map<MatrixXd>(X, inputCountPerSample, sampleCount);
+    MatrixXd YMatrix = Map<MatrixXd>(Y, inputCountPerSample, 1);
+    MatrixXd phi(inputCountPerSample, inputCountPerSample);
+    for (int i = 0; i < inputCountPerSample; i++) {
+        for (int j = 0; j < inputCountPerSample; j++) {
+            phi(i, j) = exp(-gamma * (pow(((XMatrix.row(i) - XMatrix.row(j)).norm()), 2)));
         }
     }
+    MatrixXd W = phi.inverse() * YMatrix;
+    rbf->X = XMatrix;
+    rbf->W = W;
 
-    std::cout << "Affichage des donnees de Y : " << std::endl;
-    for(int i = 0; i < rowsOfY; i++){
-        for(int j = 0; j < colsOfY; j++){
-            //std::cout << "X["<< i << "][" << j << "] =" << X[i] << std::endl;
-            std::cout << "Y["<< i << "] = " << Y[i] << std::endl;
-        }
-    }
-
-    for(int i = 0; i < epochs; i++){
-
-        //build phi
-        for(int x = 0; x < rowsOfX; x++){
-            for(int j = 0; j < colsOfX; j++){
-                //phi[x][j] = exp(-gamma* (sqrt(X[x][j] * X[x][j] + X[x][j] * X[x][j])));
-                phi[x][j] = exp(-gamma* (sqrt(X[x] * X[x] + X[x] * X[x])));
-            }
-        }
-
-        double teta[rowsOfX][colsOfX];
-        for(int i = 0; i < rowsOfX;i++){
-            for(int j = 0; j < colsOfX;j++){
-                //teta[i][j] = exp(-gamma * (sqrt(X[i][j] * X[i][j] + X[i][j] * X[i][j])));
-                teta[i][j] = exp(-gamma * (sqrt(X[i] * X[i] + X[i] * X[i])));
-                std::cout << "Teta[" << i <<"]"<<"["<<j<<"] = "<< teta[i][j] << std::endl;
-            }
-        }
-
-        Matrix<double> tetaMatrix(rowsOfX, colsOfX);
-        for (int i = 0; i < rowsOfX; ++i) {
-            for (int j = 0; j < colsOfX; ++j) {
-                tetaMatrix.put(i, j, teta[i][j]);
-            }
-        }
-
-        Matrix<double> YMatrix(rowsOfY,colsOfY);
-
-        //Dimensions de la matrice teta et de la matrice Y
-        std::cout << "Dimensions de la matrice Teta : " << tetaMatrix.getRows() << "x" << tetaMatrix.getColumns() << std::endl;
-        std::cout << "Dimensions de la matrice Y : " << YMatrix.getRows() << "x" << YMatrix.getColumns() << std::endl;
-
-
-        // Matrix<double> wn = tetaMatrix.getInverse() * YMatrix;
-        // //double res[wn.getRows()][wn.getColumns()];
-        // for(int i = 0 ; i < wn.getRows(); i++){
-        //     for(int j = 0; j < wn.getColumns(); j++){
-        //         //res[i][j] = wn.get(i,j);
-        //         std::cout << wn.get(i,j) << std::endl;
-        //     }
-        // }
-
-        /*
-        for(int i = 0; i < wn.getRows(); i++){
-            for(int j = 0; j < wn.getColumns(); j++)
-            std::cout << "Resultat : " << res[i][j] << std::endl;
-        }
-         */
-
-
-        //double** teta = getTeta(gamma,X);
-        //double wn = (reverse(getTeta) * YTrain) * exp(-gamma * norm(minus(XTrainM[i],XTrainM[epochs])));
-
-
-        //exp(-gamma * norm(XTrain));
-        //res +=
-    }
-    
 }
+
+int main() {
+    double gamma = 100;
+    int inputCountPerSample = 10;
+    int sampleCount = 2;
+
+    double X[20] = {
+            0.13984698, 0.41485388,
+            0.28093573, 0.36177096,
+            0.25704393, 0.97695092,
+            0.05471647, 0.8640708,
+            0.91900274, 0.95617945,
+            0.1753089, 0.67689523,
+            0.25784674, 0.12366917,
+            0.97495302, 0.01277128,
+            0.08287882, 0.94833339,
+            0.39418121, 0.7978936
+    };
+
+    double Y[10] = {
+            0.46119306,
+            0.78636786,
+            0.2617359,
+            0.25985246,
+            0.28554652,
+            0.57842217,
+            0.35202585,
+            0.11248387,
+            0.72196561,
+            0.60782134
+    };
+
+
+    MatrixXd XMatrix = Map<MatrixXd>(X, inputCountPerSample, sampleCount);
+    MatrixXd YMatrix = Map<MatrixXd>(Y, inputCountPerSample, 1);
+
+    /*
+    MatrixXd X(10, 2);
+    X(0, 0) = 0.13984698;
+    X(0, 1) = 0.41485388;
+    X(1, 0) = 0.28093573;
+    X(1, 1) = 0.36177096;
+    X(2, 0) = 0.25704393;
+    X(2, 1) = 0.97695092;
+    X(3, 0) = 0.05471647;
+    X(3, 1) = 0.8640708;
+    X(4, 0) = 0.91900274;
+    X(4, 1) = 0.95617945;
+    X(5, 0) = 0.1753089;
+    X(5, 1) = 0.67689523;
+    X(6, 0) = 0.25784674;
+    X(6, 1) = 0.12366917;
+    X(7, 0) = 0.97495302;
+    X(7, 1) = 0.01277128;
+    X(8, 0) = 0.08287882;
+    X(8, 1) = 0.94833339;
+    X(9, 0) = 0.39418121;
+    X(9, 1) = 0.79789368;
+     */
+    /*
+    double X[10][2] = {
+            {0.13984698, 0.41485388},
+            {0.28093573, 0.36177096},
+            {0.25704393, 0.97695092},
+            {0.05471647, 0.8640708},
+            {0.91900274, 0.95617945},
+            {0.1753089,  0.67689523},
+            {0.25784674, 0.12366917},
+            {0.97495302, 0.01277128},
+            {0.08287882, 0.94833339},
+            {0.39418121, 0.79789368}
+    };
+
+    */
+
+    /*
+    MatrixXd Y(10, 1);
+    Y(0, 0) = 0.46119306;
+    Y(1, 0) = 0.78636786;
+    Y(2, 0) = 0.2617359;
+    Y(3, 0) = 0.25985246;
+    Y(4, 0) = 0.28554652;
+    Y(5, 0) = 0.57842217;
+    Y(6, 0) = 0.35202585;
+    Y(7, 0) = 0.11248387;
+    Y(8, 0) = 0.72196561;
+    Y(9, 0) = 0.60782134;
+    */
+
+    /*
+    double Y[10] = {
+            0.46119306, 0.78636786, 0.2617359, 0.25985246, 0.28554652, 0.57842217,
+            0.35202585, 0.11248387, 0.72196561, 0.60782134
+    };*/
+    MatrixXd phi(inputCountPerSample, inputCountPerSample);
+    printf("Dimensions de X : %d x %d\n Dimensions de Y : %d x %d\n", XMatrix.rows(), XMatrix.cols(), YMatrix.rows(),
+           YMatrix.cols());
+    /*
+    cout << "Nombre de colonnes pour X : " << rowsOfX << endl;
+    cout << "Nombre de lignes pour X : " << colsOfX << endl;
+    cout << "Nombre de colonnes pour Y : " << rowsOfY << endl;
+    cout << "Nombre de lignes pour Y : " << colsOfY << endl;
+    cout << "Affichage des donnees de X : " << X << endl;
+    */
+
+    /*
+    cout << "Affichage des donnees de X : " << endl;
+    for (int i = 0; i < rowsOfX; i++) {
+        for (int j = 0; j < colsOfX; j++) {
+            cout << "X[" << i << "][" << j << "] = " << X[i][j] << endl;
+        }
+    }
+    */
+    //cout << "Affichage des donnees de X : " << XMatrix << endl;
+    //cout << "Affichage des donnees de Y : " << YMatrix << endl;
+    /*
+    cout << "Affichage des donnees de Y : " << endl;
+    for (int i = 0; i < rowsOfY; i++) {
+        for (int j = 0; j < colsOfY; j++) {
+            cout << "Y[" << i << "] = " << Y[i] << endl;
+        }
+    }
+    */
+
+    //build phi
+
+    for (int i = 0; i < inputCountPerSample; i++) {
+        for (int j = 0; j < inputCountPerSample; j++) {
+            phi(i, j) = exp(-gamma * (pow(((XMatrix.row(i) - XMatrix.row(j)).norm()), 2)));
+        }
+    }
+
+
+    MatrixXd W = phi.inverse() * YMatrix;
+
+    cout << W << endl;
+    /*
+    MatrixXd phiTemp = phi.inverse();
+    cout << phiTemp << endl;
+
+    Matrix2d phiTest;
+    phiTest << 3,5,-7,2;
+    cout << phiTest.inverse() << endl;
+     */
+
+    /*
+    MatrixXd W = Map<MatrixXd>(phiDoubleArray, inputCountPerSample, inputCountPerSample);
+
+    cout << W << endl;
+     */
+
+    //MatrixXd W = phi.inverse() * YMatrix;
+
+    //cout << W << endl;
+
+    //Dimensions de la matrice teta et de la matrice Y
+    //cout << "Dimensions de la matrice Teta : " << phi.rows() << "x"
+    //     << phi.cols()
+    //    << endl;
+    //cout << "Dimensions de la matrice Y : " << YMatrix.rows() << "x"
+    //     << YMatrix.cols()
+    //    << endl;
+
+    // Matrix<double> wn = tetaMatrix.getInverse() * YMatrix;
+    // //double res[wn.getRows()][wn.getColumns()];
+    // for(int i = 0 ; i < wn.getRows(); i++){
+    //     for(int j = 0; j < wn.getColumns(); j++){
+    //         //res[i][j] = wn.get(i,j);
+    //         cout << wn.get(i,j) << endl;
+    //     }
+    // }
+
+    /*
+    for(int i = 0; i < wn.getRows(); i++){
+        for(int j = 0; j < wn.getColumns(); j++)
+        cout << "Resultat : " << res[i][j] << endl;
+    }
+     */
+
+    //double** teta = getTeta(gamma,X);
+    //double wn = (reverse(getTeta) * YTrain) * exp(-gamma * norm(minus(XTrainM[i],XTrainM[epochs])));
+
+    //exp(-gamma * norm(XTrain));
+}
+
 
 }
