@@ -42,8 +42,32 @@ using namespace std;
 
 extern "C" {
 
+typedef struct RBF{
+    MatrixXd W;
+    MatrixXd X;
+    double* gamma;
+} RBF;
+
+RBF* initRBF(double* W, MatrixXd X, MatrixXd W, double gamma)
+
+void naive_rbf_train(RBF* rbf,double* X, double* Y,int inputCountPerSample, int sampleCount ,double gamma = 100,bool useBias = false){
+    double* res;
+    MatrixXd XMatrix = Map<MatrixXd>(X, inputCountPerSample, sampleCount);
+    MatrixXd YMatrix = Map<MatrixXd>(Y, inputCountPerSample, 1);
+    MatrixXd phi(inputCountPerSample, inputCountPerSample);
+    for (int i = 0; i < inputCountPerSample; i++) {
+        for (int j = 0; j < inputCountPerSample; j++) {
+            phi(i, j) = exp(-gamma * (pow(((XMatrix.row(i) - XMatrix.row(j)).norm()), 2)));
+        }
+    }
+    MatrixXd W = phi.inverse() * YMatrix;
+    rbf->X = XMatrix;
+    rbf->W = W;
+
+}
+
 int main() {
-    double gamma = 1;
+    double gamma = 100;
     int inputCountPerSample = 10;
     int sampleCount = 2;
 
@@ -169,23 +193,28 @@ int main() {
 
     for (int i = 0; i < inputCountPerSample; i++) {
         for (int j = 0; j < inputCountPerSample; j++) {
-            phi(i, j) = exp(-gamma * pow((XMatrix.row(i) - XMatrix.row(j)).norm(), 2));
-            //cout << phi(i, j) << endl;
+            phi(i, j) = exp(-gamma * (pow(((XMatrix.row(i) - XMatrix.row(j)).norm()), 2)));
         }
     }
 
-    double phiDoubleArray[20];
-    int x = 0;
-    for(int i = 0; i < inputCountPerSample; i++){
-        for(int j = 0; j < inputCountPerSample; j++){
-            phiDoubleArray[x] = phi(i,j);
-            x++;
-        }
-    }
 
+    MatrixXd W = phi.inverse() * YMatrix;
+
+    cout << W << endl;
+    /*
+    MatrixXd phiTemp = phi.inverse();
+    cout << phiTemp << endl;
+
+    Matrix2d phiTest;
+    phiTest << 3,5,-7,2;
+    cout << phiTest.inverse() << endl;
+     */
+
+    /*
     MatrixXd W = Map<MatrixXd>(phiDoubleArray, inputCountPerSample, inputCountPerSample);
 
     cout << W << endl;
+     */
 
     //MatrixXd W = phi.inverse() * YMatrix;
 
