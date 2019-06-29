@@ -45,13 +45,17 @@ extern "C" {
 typedef struct RBF{
     MatrixXd W;
     MatrixXd X;
-    double* gamma;
+    double gamma;
 } RBF;
 
-RBF* initRBF(double* W, MatrixXd X, MatrixXd W, double gamma)
+RBF* initRBF(MatrixXd XMatrix, MatrixXd WMatrix, double gamma){
+    RBF* rbf = new RBF();
+    rbf->W = WMatrix;
+    rbf->X = XMatrix;
+    rbf->gamma = gamma;
+}
 
-void naive_rbf_train(RBF* rbf,double* X, double* Y,int inputCountPerSample, int sampleCount ,double gamma = 100,bool useBias = false){
-    double* res;
+RBF* naive_rbf_train(double* X, double* Y,int inputCountPerSample, int sampleCount ,double gamma = 100,bool useBias = false){
     MatrixXd XMatrix = Map<MatrixXd>(X, inputCountPerSample, sampleCount);
     MatrixXd YMatrix = Map<MatrixXd>(Y, inputCountPerSample, 1);
     MatrixXd phi(inputCountPerSample, inputCountPerSample);
@@ -61,9 +65,8 @@ void naive_rbf_train(RBF* rbf,double* X, double* Y,int inputCountPerSample, int 
         }
     }
     MatrixXd W = phi.inverse() * YMatrix;
-    rbf->X = XMatrix;
-    rbf->W = W;
-
+    RBF* rbf = initRBF(XMatrix,W,gamma);
+    return rbf;
 }
 
 int main() {
@@ -97,9 +100,15 @@ int main() {
             0.60782134
     };
 
+    RBF* rbfModel = naive_rbf_train(X,Y,10,2,100,false);
+    cout << rbfModel->X << endl;
+    cout << rbfModel->W << endl;
+    cout << rbfModel->gamma << endl;
 
+    /*
     MatrixXd XMatrix = Map<MatrixXd>(X, inputCountPerSample, sampleCount);
     MatrixXd YMatrix = Map<MatrixXd>(Y, inputCountPerSample, 1);
+     */
 
     /*
     MatrixXd X(10, 2);
@@ -159,9 +168,11 @@ int main() {
             0.46119306, 0.78636786, 0.2617359, 0.25985246, 0.28554652, 0.57842217,
             0.35202585, 0.11248387, 0.72196561, 0.60782134
     };*/
+    /*
     MatrixXd phi(inputCountPerSample, inputCountPerSample);
     printf("Dimensions de X : %d x %d\n Dimensions de Y : %d x %d\n", XMatrix.rows(), XMatrix.cols(), YMatrix.rows(),
            YMatrix.cols());
+    */
     /*
     cout << "Nombre de colonnes pour X : " << rowsOfX << endl;
     cout << "Nombre de lignes pour X : " << colsOfX << endl;
@@ -191,6 +202,7 @@ int main() {
 
     //build phi
 
+    /*
     for (int i = 0; i < inputCountPerSample; i++) {
         for (int j = 0; j < inputCountPerSample; j++) {
             phi(i, j) = exp(-gamma * (pow(((XMatrix.row(i) - XMatrix.row(j)).norm()), 2)));
@@ -201,6 +213,7 @@ int main() {
     MatrixXd W = phi.inverse() * YMatrix;
 
     cout << W << endl;
+     */
     /*
     MatrixXd phiTemp = phi.inverse();
     cout << phiTemp << endl;
