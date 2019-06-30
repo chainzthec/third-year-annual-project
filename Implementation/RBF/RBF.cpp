@@ -3,16 +3,16 @@
 //
 
 #if _WIN32
-#define SUPEREXPORT __declspec(dllexport)
+    #define SUPEREXPORT __declspec(dllexport)
+    #include <ctime>
 #else
-#define SUPEREXPORT
+    #define SUPEREXPORT
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <cmath>
 #include <iostream>
-#include <ctime>
 
 #include "../Librairie/Eigen/Dense"
 #include "../Librairie/Eigen/Eigen"
@@ -20,43 +20,34 @@
 using namespace Eigen;
 using namespace std;
 
-/**
- *
- *
- * X: [[0.13984698 0.41485388]
- [0.28093573 0.36177096]
- [0.25704393 0.97695092]
- [0.05471647 0.8640708 ]
- [0.91900274 0.95617945]
- [0.1753089  0.67689523]
- [0.25784674 0.12366917]
- [0.97495302 0.01277128]
- [0.08287882 0.94833339]
- [0.39418121 0.79789368]]
- Y: [0.46119306 0.78636786 0.2617359  0.25985246 0.28554652 0.57842217
- 0.35202585 0.11248387 0.72196561 0.60782134]
-
- value after predict for this dataset = 0.7863678645709891
-
- */
-
 extern "C" {
 
-typedef struct RBF{
+typedef struct RBF {
     MatrixXd W;
     MatrixXd X;
+    MatrixXd MuMatrix;
     double gamma;
 } RBF;
 
-RBF* initRBF(MatrixXd XMatrix, MatrixXd WMatrix, double gamma){
-    RBF* rbf = new RBF();
-    rbf->W = WMatrix;
-    rbf->X = XMatrix;
-    rbf->gamma = gamma;
+int getRand(int iter, int max) {
+    srand(time(0) * (iter + 1 * 5));
+    int size = max;
+    int res = rand() % size;
+    return res;
 }
 
-RBF* naive_rbf_train(double* X, double* Y,int inputCountPerSample, int sampleCount ,double gamma = 100,bool useBias = false){
-    MatrixXd XMatrix = Map<MatrixXd>(X, inputCountPerSample, sampleCount);
+RBF *initRBF(MatrixXd X, MatrixXd WMatrix, double gamma, MatrixXd MuMatrix) {
+    RBF *rbf = new RBF();
+    rbf->W = WMatrix;
+    rbf->X = X;
+    rbf->gamma = gamma;
+    rbf->MuMatrix = MuMatrix;
+    return rbf;
+}
+
+SUPEREXPORT RBF *naive_rbf_train(double *X, double *Y, int inputCountPerSample, int sampleCount, double gamma = 100,
+                     bool useBias = false) {
+    MatrixXd XMatrix = Map<Matrix<double, Dynamic, Dynamic, RowMajor>>(X, inputCountPerSample, sampleCount);
     MatrixXd YMatrix = Map<MatrixXd>(Y, inputCountPerSample, 1);
     MatrixXd phi(inputCountPerSample, inputCountPerSample);
     for (int i = 0; i < inputCountPerSample; i++) {
@@ -65,11 +56,93 @@ RBF* naive_rbf_train(double* X, double* Y,int inputCountPerSample, int sampleCou
         }
     }
     MatrixXd W = phi.inverse() * YMatrix;
-    RBF* rbf = initRBF(XMatrix,W,gamma);
+    RBF *rbf = initRBF(XMatrix, W, gamma, XMatrix);
     return rbf;
 }
 
+SUPEREXPORT double naive_rbf_predict(RBF *rbf, double *sample) {
+    MatrixXd sampleMatrix = Map<MatrixXd>(sample, 1, rbf->X.cols());
+    MatrixXd gaussianOutputs(1, rbf->X.rows());
+    for (int i = 0; i < rbf->X.rows(); i++) {
+        gaussianOutputs(0, i) = exp((-rbf->gamma) * (pow(((rbf->X.row(i) - sampleMatrix).norm()), 2)));
+    }
+    return (gaussianOutputs * rbf->W).sum();
+}
+
+SUPEREXPORT RBF *rbf_train(double *X, double *Y, int inputCountPerSample, int sampleCount, int epochs = 100, int k = 2,
+               double gamma = 100,
+               bool useBias = false) {
+    MatrixXd XMatrix = Map<Matrix<double, Dynamic, Dynamic, RowMajor>>(X, inputCountPerSample, sampleCount);
+    MatrixXd YMatrix = Map<MatrixXd>(Y, inputCountPerSample, 1);
+    MatrixXd AMatrix = Map<MatrixXd>(XMatrix.data(), k, sampleCount);
+    MatrixXd DistanceMatrix = Map<MatrixXd>(XMatrix.data(), inputCountPerSample, 1);
+
+    //Randomize AMatrix
+    for (int i = 0; i < k; i++) {
+        AMatrix.row(i) = XMatrix.row(getRand(i, inputCountPerSample));
+    }
+
+    //Initialize distance matrix with -1
+    for (int i = 0; i < DistanceMatrix.rows(); i++) {
+        DistanceMatrix(i, 0) = -1;
+    }
+
+    MatrixXd TempMatrix = MatrixXd::Zero(inputCountPerSample, sampleCount);
+    MatrixXd AveragesMatrix = Map<MatrixXd>(DistanceMatrix.data(), inputCountPerSample, 1);
+    for (int x = 0; x < epochs; x++) {
+        TempMatrix = DistanceMatrix;
+
+        //Fill DistanceMatrix with distance of each point with the centers
+        for (int i = 0; i < XMatrix.rows(); i++) {
+            for (int j = 0; j < AMatrix.rows(); j++) {
+                double distance = (AMatrix.row(j) - XMatrix.row(i)).norm();
+                if (DistanceMatrix(i, 0) == -1 || distance < DistanceMatrix(i, 0)) {
+                    DistanceMatrix(i, 0) = distance / sampleCount;
+                }
+            }
+        }
+
+        if (DistanceMatrix == TempMatrix) {
+            MatrixXd TempMatrix2 = MatrixXd::Zero(inputCountPerSample, sampleCount);
+            for (int i = 0; i < XMatrix.rows(); i++) {
+                for (int j = 0; j < DistanceMatrix.rows(); j++) {
+                    for (int l = 0; l < XMatrix.cols(); l++) {
+                        if (DistanceMatrix(i, 0) == 0) {
+                            TempMatrix2(i, l) += XMatrix(i, l);
+                        }
+                    }
+                }
+            }
+
+            MatrixXd phi(inputCountPerSample, inputCountPerSample);
+            for (int i = 0; i < inputCountPerSample; i++) {
+                for (int j = 0; j < inputCountPerSample; j++) {
+
+                    phi(i, j) = exp(-gamma * (pow(((XMatrix.row(i) - TempMatrix2.row(j)).norm()), 2)));
+
+                }
+            }
+            cout << phi << endl;
+            MatrixXd W = (phi.transpose() * phi).inverse() * phi.transpose() * YMatrix;
+            cout << W << endl;
+            RBF *rbf = initRBF(XMatrix, W, gamma, TempMatrix2);
+            return rbf;
+        }
+    }
+    return nullptr;
+}
+
+SUPEREXPORT double rbf_predict(RBF *rbf, double *sample) {
+    MatrixXd sampleMatrix = Map<MatrixXd>(sample, 1, rbf->X.cols());
+    MatrixXd gaussianOutputs(1, rbf->X.rows());
+    for (int i = 0; i < rbf->X.rows(); i++) {
+        gaussianOutputs(0, i) = exp((-rbf->gamma) * (pow(((rbf->X.row(i) - rbf->MuMatrix.row(i)).norm()), 2)));
+    }
+    return (gaussianOutputs * rbf->W).sum();
+}
+
 int main() {
+    //TODO ajouter sign à la classif naive rbf predict
     double gamma = 100;
     int inputCountPerSample = 10;
     int sampleCount = 2;
@@ -100,168 +173,17 @@ int main() {
             0.60782134
     };
 
-    RBF* rbfModel = naive_rbf_train(X,Y,10,2,100,false);
-    cout << rbfModel->X << endl;
-    cout << rbfModel->W << endl;
-    cout << rbfModel->gamma << endl;
+    double sample[2] = {0.28093573, 0.36177096};
 
-    /*
-    MatrixXd XMatrix = Map<MatrixXd>(X, inputCountPerSample, sampleCount);
-    MatrixXd YMatrix = Map<MatrixXd>(Y, inputCountPerSample, 1);
-     */
+    RBF *rbfModel = naive_rbf_train(X, Y, 10, 2, 100);
+    double res = naive_rbf_predict(rbfModel, sample);
 
-    /*
-    MatrixXd X(10, 2);
-    X(0, 0) = 0.13984698;
-    X(0, 1) = 0.41485388;
-    X(1, 0) = 0.28093573;
-    X(1, 1) = 0.36177096;
-    X(2, 0) = 0.25704393;
-    X(2, 1) = 0.97695092;
-    X(3, 0) = 0.05471647;
-    X(3, 1) = 0.8640708;
-    X(4, 0) = 0.91900274;
-    X(4, 1) = 0.95617945;
-    X(5, 0) = 0.1753089;
-    X(5, 1) = 0.67689523;
-    X(6, 0) = 0.25784674;
-    X(6, 1) = 0.12366917;
-    X(7, 0) = 0.97495302;
-    X(7, 1) = 0.01277128;
-    X(8, 0) = 0.08287882;
-    X(8, 1) = 0.94833339;
-    X(9, 0) = 0.39418121;
-    X(9, 1) = 0.79789368;
-     */
-    /*
-    double X[10][2] = {
-            {0.13984698, 0.41485388},
-            {0.28093573, 0.36177096},
-            {0.25704393, 0.97695092},
-            {0.05471647, 0.8640708},
-            {0.91900274, 0.95617945},
-            {0.1753089,  0.67689523},
-            {0.25784674, 0.12366917},
-            {0.97495302, 0.01277128},
-            {0.08287882, 0.94833339},
-            {0.39418121, 0.79789368}
-    };
+    cout << res << endl;
 
-    */
+    RBF *rbfModel2 = rbf_train(X, Y, inputCountPerSample, sampleCount, 100, 2, 100);
+    double res2 = rbf_predict(rbfModel2, sample);
+    cout << res2 << endl;
 
-    /*
-    MatrixXd Y(10, 1);
-    Y(0, 0) = 0.46119306;
-    Y(1, 0) = 0.78636786;
-    Y(2, 0) = 0.2617359;
-    Y(3, 0) = 0.25985246;
-    Y(4, 0) = 0.28554652;
-    Y(5, 0) = 0.57842217;
-    Y(6, 0) = 0.35202585;
-    Y(7, 0) = 0.11248387;
-    Y(8, 0) = 0.72196561;
-    Y(9, 0) = 0.60782134;
-    */
-
-    /*
-    double Y[10] = {
-            0.46119306, 0.78636786, 0.2617359, 0.25985246, 0.28554652, 0.57842217,
-            0.35202585, 0.11248387, 0.72196561, 0.60782134
-    };*/
-    /*
-    MatrixXd phi(inputCountPerSample, inputCountPerSample);
-    printf("Dimensions de X : %d x %d\n Dimensions de Y : %d x %d\n", XMatrix.rows(), XMatrix.cols(), YMatrix.rows(),
-           YMatrix.cols());
-    */
-    /*
-    cout << "Nombre de colonnes pour X : " << rowsOfX << endl;
-    cout << "Nombre de lignes pour X : " << colsOfX << endl;
-    cout << "Nombre de colonnes pour Y : " << rowsOfY << endl;
-    cout << "Nombre de lignes pour Y : " << colsOfY << endl;
-    cout << "Affichage des donnees de X : " << X << endl;
-    */
-
-    /*
-    cout << "Affichage des donnees de X : " << endl;
-    for (int i = 0; i < rowsOfX; i++) {
-        for (int j = 0; j < colsOfX; j++) {
-            cout << "X[" << i << "][" << j << "] = " << X[i][j] << endl;
-        }
-    }
-    */
-    //cout << "Affichage des donnees de X : " << XMatrix << endl;
-    //cout << "Affichage des donnees de Y : " << YMatrix << endl;
-    /*
-    cout << "Affichage des donnees de Y : " << endl;
-    for (int i = 0; i < rowsOfY; i++) {
-        for (int j = 0; j < colsOfY; j++) {
-            cout << "Y[" << i << "] = " << Y[i] << endl;
-        }
-    }
-    */
-
-    //build phi
-
-    /*
-    for (int i = 0; i < inputCountPerSample; i++) {
-        for (int j = 0; j < inputCountPerSample; j++) {
-            phi(i, j) = exp(-gamma * (pow(((XMatrix.row(i) - XMatrix.row(j)).norm()), 2)));
-        }
-    }
-
-
-    MatrixXd W = phi.inverse() * YMatrix;
-
-    cout << W << endl;
-     */
-    /*
-    MatrixXd phiTemp = phi.inverse();
-    cout << phiTemp << endl;
-
-    Matrix2d phiTest;
-    phiTest << 3,5,-7,2;
-    cout << phiTest.inverse() << endl;
-     */
-
-    /*
-    MatrixXd W = Map<MatrixXd>(phiDoubleArray, inputCountPerSample, inputCountPerSample);
-
-    cout << W << endl;
-     */
-
-    //MatrixXd W = phi.inverse() * YMatrix;
-
-    //cout << W << endl;
-
-    //Dimensions de la matrice teta et de la matrice Y
-    //cout << "Dimensions de la matrice Teta : " << phi.rows() << "x"
-    //     << phi.cols()
-    //    << endl;
-    //cout << "Dimensions de la matrice Y : " << YMatrix.rows() << "x"
-    //     << YMatrix.cols()
-    //    << endl;
-
-    // Matrix<double> wn = tetaMatrix.getInverse() * YMatrix;
-    // //double res[wn.getRows()][wn.getColumns()];
-    // for(int i = 0 ; i < wn.getRows(); i++){
-    //     for(int j = 0; j < wn.getColumns(); j++){
-    //         //res[i][j] = wn.get(i,j);
-    //         cout << wn.get(i,j) << endl;
-    //     }
-    // }
-
-    /*
-    for(int i = 0; i < wn.getRows(); i++){
-        for(int j = 0; j < wn.getColumns(); j++)
-        cout << "Resultat : " << res[i][j] << endl;
-    }
-     */
-
-    //double** teta = getTeta(gamma,X);
-    //double wn = (reverse(getTeta) * YTrain) * exp(-gamma * norm(minus(XTrainM[i],XTrainM[epochs])));
-
-    //exp(-gamma * norm(XTrain));
 }
-
 
 }
