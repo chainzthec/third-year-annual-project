@@ -26,42 +26,46 @@ typedef struct sampleRBF{
 
 }RBF;
 
-RBF* initRBF(double *W, int inPutSize, int outPutSize){
+RBF* create_rbf_model(double *W, int inPutSize, int outPutSize){
+	
 	RBF* myRBF = new RBF();
 	myRBF->Wi = new double[inPutSize];
 	myRBF->Wo = new double[outPutSize];
 	myRBF->gamma = 100;
 
 	for(int i = 0;i < inPutSize; i++){
-		
-			myRBF->Wi[i] = W[i];
+		myRBF->Wi[i] = W[i];
 	}
 
 	return myRBF;
 }
 
-
 double sign(double a){
-	if(a > 0){
-		return 1;
-	}
-	if(a == 0){
-		return 0;
-	}
-	if(a < 0){
-		return -1;
-	}
+
+	if(a > 0){return 1;}
+
+	if(a == 0){return 0;}
+
+	if(a < 0){return -1;}
 }
 
-double distance(point* a, point* b){
+double distance(double** a, double** b,int i, int j){
+	
 	double d = 0;
-	d = sqrt( pow( (a->x - b->x), 2) + pow( (a->y - b->y), 2) );
-	sqrt( pow( (a->x - b->x), 2) + pow( (a->y - b->y), 2) );	
+	d = sqrt( pow( (a[i][0] - b[j][0]), 2) + pow( (a[i][1] - b[i][1]), 2) );
 	return d;
 }
 
+double getRand(double min, double max) {
+    
+    double val = (double) rand() / RAND_MAX;
+    val = min + val * (max - min);
+
+    return val;
+}
 
 Matrix<double> transformDoubleToMatrix(double *mat, int rows, int cols = 1) {
+    
     int currentPos = 0;
     Matrix<double> res(rows, cols);
     for (int i = 0; i < rows; ++i) {
@@ -74,41 +78,40 @@ Matrix<double> transformDoubleToMatrix(double *mat, int rows, int cols = 1) {
     return res;
 }
 
-double* RbfWeight(double *Ytrain, point* Xtrain, int sizeRbf,RBF* myRBF){
+double* naive_rbf_train(double *Ytrain, double** Xtrain, int sizeRbf,RBF* myRBF){
 
-	double** teta = new double* [sizeRbf];
-	double* tetaToTran = new double[sizeRbf*sizeRbf];
+	double** phi = new double* [sizeRbf];
+	double* phiToTran = new double[sizeRbf*sizeRbf];
 	double* distancel = new double[sizeRbf];
 	for(int i = 0;i < sizeRbf; i++ ){ 
-		teta[i] = new double[sizeRbf];
-		
+		phi[i] = new double[sizeRbf];
+		distancel[i] = distance(Xtrain, Xtrain ,i , i);
 		for(int j = 0;j < sizeRbf; j++ ){
-			distancel[i] = distance(&Xtrain[i], &Xtrain[j]);
-			teta[i][j] = exp(-myRBF->gamma*pow( distancel[i], 2));
-			tetaToTran[i*sizeRbf+j] = teta[i][j];	
+			
+			phi[i][j] = exp(-myRBF->gamma*pow( distancel[i], 2));
+			phiToTran[i*sizeRbf+j] = phi[i][j];	
 			
 			
 		}
 		printf("=/");
 	}
 	
-	Matrix<double>tetaFin = transformDoubleToMatrix(tetaToTran, sizeRbf,sizeRbf);
+	Matrix<double>phiFin = transformDoubleToMatrix(phiToTran, sizeRbf,sizeRbf);
 	Matrix<double>YFin = transformDoubleToMatrix(Ytrain,sizeRbf,1);
-	Matrix<double>W = tetaFin.getInverse() * YFin;
+	Matrix<double>W = phiFin.getInverse() * YFin;
 
 	return W.convertToDouble();
 }
 
-void regresRBF(point* Xtrain, double* W, RBF* myRBF, int sizeRbf){
+void naive_rbf_predict(double** Xtrain, double* W, RBF* myRBF, int sizeRbf){
 	
 	double *res = new double[sizeRbf];
 	double* distancel = new double[sizeRbf];
 	for(int i = 0;i < sizeRbf; i++ ){
-		distancel[i] = distance(&Xtrain[i], &Xtrain[1]);
+		distancel[i] = distance(Xtrain, Xtrain ,i ,1);
 		
 			for(int j = 0;j< sizeRbf; j++){
 				res[i] = W[i]* exp((-myRBF->gamma)*pow(distancel[i], 2));		
-				
 			}
 		}
 		
@@ -118,65 +121,164 @@ void regresRBF(point* Xtrain, double* W, RBF* myRBF, int sizeRbf){
 	
 }
 
-void classifRBF(point* Xtrain, double* W, RBF* myRBF, int sizeRbf){
+void naive_rbf_classif(double** Xtrain, double* W, RBF* myRBF, int sizeRbf){
 	
-	double res = 0.0;
+	double tmp;
+	double *res = new double[sizeRbf];
 	double* distancel = new double[sizeRbf];
 	for(int i = 0;i < sizeRbf; i++ ){
-		distancel[i] = distance(&Xtrain[i], &Xtrain[i+1]);
+		distancel[i] = distance(Xtrain, Xtrain ,i ,1);
+		for(int j = 0;j< sizeRbf; j++){
+			res[i] = W[i]* exp((-myRBF->gamma)*pow(distancel[i], 2));		
+				
+		}
+	}
+		
+	for(int i = 0 ; i< sizeRbf;i++){
+		 tmp += res[i];	
+	}
+
+	myRBF->Wo[0] = sign(tmp);
+}
+
+double** mu_lloyd_rbf(double** XTrain, int k_mu, int sizeRbf ,double max, double min){
+	
+	int *i_init = new int [k_mu];
+	double sum = 0.0;
+	double** mu = new double *[k_mu];
+	for(int i = 0; i < k_mu; i ++){
+		i_init[i] = getRand(sizeRbf, 0);//TODO :fonction init mu
+		mu[i] = new double[k_mu];
+		}
+		for(int f = 0; f < sizeRbf; f++){
+			for(int j = 0; j < k_mu; j++){
+				mu[f][j] = XTrain[f][i_init[j]];
+			}	
+		}
+		
+	double* S = new double[k_mu];
+	for(int k = 0 ; k < k_mu ; k++){
+		for(int n = 0 ;n < sizeRbf; n++){
+			if( distance(XTrain,mu,n,k) <= distance(XTrain,mu,n,i_init[k]) ){
+				i_init[k] = k;	
+				S[k] = XTrain[k][n];//avoir
+				printf("%f\ni:%d ",S[k],k );
+			}
+			
+			
+		}
+		
+		sum += S[k] * XTrain[k][k];	
+	}
+	for(int i = 0 ; i < k_mu ; i++){
+		for(int k = 0 ; k < k_mu ; k++){
+
+			mu[i][k] = 1/(abs(S[k])) * sum;//TODO :fonction mise à jour mu
+		}
+	}
+
+	return mu;
+
+}
+
+
+double* k_mean_rbf_train(double* YTrain, double** XTrain,double** mu, RBF *myRBF, int sizeRbf){
+
+	double** phi = new double* [sizeRbf];
+	double* phiToTran = new double[sizeRbf*sizeRbf];
+	double* distancel = new double[sizeRbf];
+	for(int i = 0;i < sizeRbf; i++ ){ 
+		phi[i] = new double[sizeRbf];
+		distancel[i] = distance(XTrain, mu ,i , i);
+		for(int j = 0;j < sizeRbf; j++ ){
+			
+			phi[i][j] = exp(-myRBF->gamma*pow( distancel[i], 2));
+			phiToTran[i*sizeRbf+j] = phi[i][j];	
+		}
+		printf("=/");
+	}
+	
+	
+	Matrix<double>phiFin = transformDoubleToMatrix(phiToTran, sizeRbf,sizeRbf);
+	Matrix<double>phiTrans = phiFin.getTranspose();
+	Matrix<double>produit = phiTrans * phiFin;
+	Matrix<double>YFin = transformDoubleToMatrix(YTrain,sizeRbf,1);
+	Matrix<double>W = produit.getInverse() * phiTrans * YFin;
+
+	return W.convertToDouble();
+
+}
+
+
+void k_mean_rbf_predict(double** Xtrain, double* W, RBF* myRBF, int sizeRbf){
+	
+	double tmp;
+	double *res = new double[sizeRbf];
+	double* distancel = new double[sizeRbf];
+	for(int i = 0;i < sizeRbf; i++ ){
+		distancel[i] = distance(Xtrain, Xtrain ,i ,1);
+		
 			for(int j = 0;j< sizeRbf; j++){
-				res += W[i]* exp((-myRBF->gamma)*pow((distancel[i]), 2));		
+				res[i] = W[i]* exp((-myRBF->gamma)*pow(distancel[i], 2));		
+				
 			}
 		}
+		
+	for(int i = 0 ; i< sizeRbf;i++){
+		 tmp += res[i];	
+	}
+
+	myRBF->Wo[0] = tmp;
 	
-	myRBF->Wo[0] = sign(res);
 }
 
 
 int main (){
 //init XTrain
 //init YTrain
-	point*XTrain = new point[7];
+	double **XTrain = new double*[7];
+	for(int i = 0; i< 7 ; i++){
+		XTrain[i] = new double [2];
+	}
 	
 	double YTrain[7][1];
 	
-	XTrain[0].x = 0.13984698 ;
-    XTrain[0].y = 0.41485388;
+	XTrain[0][0] = 0.13984698;
+    XTrain[0][1] = 0.41485388;
 
-    XTrain[1].x = 0.28093573 ;
-    XTrain[1].y = 0.36177096;
+    XTrain[1][0] = 0.28093573;
+    XTrain[1][1] = 0.36177096;
 
-    XTrain[2].x = 0.25704393 ;
-    XTrain[2].y = 0.97695092;
+    XTrain[2][0] = 0.25704393;
+    XTrain[2][1] = 0.97695092;
 
-    XTrain[3].x = 0.05471647 ;
-    XTrain[3].y = 0.8640708;
+    XTrain[3][0] = 0.05471647;
+    XTrain[3][1] = 0.8640708;
 
-    XTrain[4].x = 0.91900274;
-    XTrain[4].y = 0.95617945;
+    XTrain[4][0] = 0.91900274;
+    XTrain[4][1] = 0.95617945;
 
-    XTrain[5].x = 0.1753089;
-    XTrain[5].y = 0.67689523;
+    XTrain[5][0] = 0.1753089;
+    XTrain[5][1] = 0.67689523;
 	
-    XTrain[6].x = 0.25784674;
-    XTrain[6].y = 0.12366917;
-            
-  	XTrain[7].x = 0.97495302;
-    XTrain[7].y = 0.01277128;
-            
-
+    XTrain[6][0] = 0.25784674;
+    XTrain[6][1] = 0.12366917;  
 
     YTrain[0][0] = 0.46119306;
     YTrain[1][0] = 0.78636786;
+    
     YTrain[2][0] = 0.2617359 ;
 	YTrain[3][0] = 0.25985246;
+	
 	YTrain[4][0] = 0.28554652;
 	YTrain[5][0] = 0.57842217;
+	
 	YTrain[6][0] = 0.35202585;
 	YTrain[7][0] = 0.11248387;
 
 
     double W[7]{
+
             0.5,
             0.5,
             0.5,
@@ -188,13 +290,17 @@ int main (){
 
    
 
-   RBF* myRBF = initRBF(W, 7, 1);
-   double*newWeight = RbfWeight(*YTrain,XTrain,7,myRBF);
-   regresRBF(XTrain, newWeight, myRBF,7);
-   //classifRBF(XTrain, newWeight, myRBF,4);
-   printf("\nreg:%f\n",myRBF->Wo[0] );  
-   //printf("classif:%f\n",myRBF->Wo[0] );  
+   	RBF* myRBF = create_rbf_model(W, 7, 1);
+   	//double **mu = mu_lloyd_rbf(XTrain,7 ,3 ,0.05, 0.97 );
+   	double*model =  naive_rbf_train (*YTrain,XTrain,7,myRBF);//k_mean_rbf_train(*YTrain, XTrain, mu, myRBF,7);
+   	naive_rbf_predict(XTrain, model, myRBF,7);
 
+   	//k_mean_rbf_train(*YTrain, XTrain,mu, myRBF,7);
+   	//k_mean_rbf_predict(XTrain, model, myRBF,7);
+   	//naive_rbf_classifRBF(XTrain, newWeight, myRBF,4);
+   	printf("\nreg:%f\n",myRBF->Wo[0] );  
+   	//printf("classif:%f\n",myRBF->Wo[0] );  
+	free(myRBF);
 
 return 0;
 }
