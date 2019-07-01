@@ -4,17 +4,20 @@
 
 from ctypes import *
 import platform as pf
-from pathlib import Path
+import json
+import os
 
-path = str(Path().absolute()).replace("\\", "/")
+my_file = open("../settings.json","r")
+path = json.load(my_file)['projet_path'].replace("\\","/")
+my_file.close()
 os_name = pf.system()
 
 if os_name == "Darwin":
-    my_dll = cdll.LoadLibrary(path + "/RBF/Librairie/Mac/RBF_Mac.so")  # For Mac
+    my_dll = cdll.LoadLibrary(path + "/Implementation/RBF/Librairie/Mac/RBF_Mac.so")  # For Mac
 elif os_name == "Windows":
-    my_dll = cdll.LoadLibrary(path + "/RBF/Librairie/Windows/RBF_Windows.dll")  # For Windows
+    my_dll = cdll.LoadLibrary(path + "/Implementation/RBF/Librairie/Windows/RBF_Windows.dll")  # For Windows
 elif os_name == "Linux":
-    my_dll = cdll.LoadLibrary(path + "/RBF/Librairie/Linux/RBF_Linux.so")  # For Linux
+    my_dll = cdll.LoadLibrary(path + "/Implementation/RBF/Librairie/Linux/RBF_Linux.so")  # For Linux
 else:
     raise ValueError("Error : OS is not supported")
 

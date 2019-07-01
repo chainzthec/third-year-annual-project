@@ -5,18 +5,21 @@
 
 from ctypes import *
 import platform as pf
-from pathlib import Path
+import json
 
-path = str(Path().absolute()).replace("\\", "/")
+
+my_file = open("../settings.json","r")
+path = json.load(my_file)['projet_path'].replace("\\","/")
+my_file.close()
 
 os_name = pf.system()
 
 if os_name == "Darwin":
-    my_dll = cdll.LoadLibrary(path + "/Rosenblatt/Librairie/Mac/Rosenblatt_Mac.so")  # For Mac
+    my_dll = cdll.LoadLibrary(path + "/Implementation/Rosenblatt/Librairie/Mac/Rosenblatt_Mac.so")  # For Mac
 elif os_name == "Windows":
-    my_dll = cdll.LoadLibrary(path + "/Rosenblatt/Librairie/Windows/Rosenblatt_Windows.dll")  # For windows
+    my_dll = cdll.LoadLibrary(path + "/Implementation/Rosenblatt/Librairie/Windows/Rosenblatt_Windows.dll")  # For windows
 elif os_name == "Linux":
-    my_dll = cdll.LoadLibrary(path + "/Rosenblatt/Librairie/Linux/Rosenblatt_Linux.so")  # For Linux
+    my_dll = cdll.LoadLibrary(path + "/Implementation/Rosenblatt/Librairie/Linux/Rosenblatt_Linux.so")  # For Linux
 else:
     raise ValueError("Error : OS is not supported")
 
