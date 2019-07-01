@@ -62,7 +62,7 @@ SUPEREXPORT RBF *naive_rbf_train(double *X, double *Y, int inputCountPerSample, 
 
 SUPEREXPORT int sign(double pred){
     if(pred < 0){
-        return 0;
+        return -1;
     }else{
         return 1;
     }
@@ -74,7 +74,8 @@ SUPEREXPORT int naive_rbf_predict(RBF *rbf, double *sample) {
     for (int i = 0; i < rbf->X.rows(); i++) {
         gaussianOutputs(0, i) = exp((-rbf->gamma) * (pow(((rbf->X.row(i) - sampleMatrix).norm()), 2)));
     }
-    return sign((double)(gaussianOutputs * rbf->W).sum());
+    double res = (gaussianOutputs * rbf->W).sum();
+    return sign(res);
 }
 
 SUPEREXPORT RBF *rbf_train(double *X, double *Y, int inputCountPerSample, int sampleCount, int epochs = 100, int k = 2,

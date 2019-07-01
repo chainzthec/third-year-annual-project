@@ -77,6 +77,6 @@ def naive_rbf_predict(model, sample):
         c_void_p,
         POINTER(c_double)
     ]
-    my_dll.naive_rbf_predict.restype = c_double
+    my_dll.naive_rbf_predict.restype = c_int32
     predict_value = my_dll.naive_rbf_predict(model, c_sample_double)
     return predict_value

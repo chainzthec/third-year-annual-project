@@ -14,71 +14,77 @@ my_file.close()
 os_name = pf.system()
 
 if os_name == "Darwin":
-    my_dll = cdll.LoadLibrary(path + "/Implementation/MLP/Librairie/Mac/MultiLayerPerceptron_Mac.so")  # For Mac
+    myDll = cdll.LoadLibrary(path + "/Implementation/MLP/Librairie/Mac/MultiLayerPerceptron_Mac.so")  # For Mac
 elif os_name == "Windows":
-    my_dll = cdll.LoadLibrary(
+    myDll = cdll.LoadLibrary(
         path + "/Implementation/MLP/Librairie/Windows/MultiLayerPerceptron_Windows.dll")  # For Windows
 elif os_name == "Linux":
-    my_dll = cdll.LoadLibrary(path + "/Implementation/MLP/Librairie/Linux/MultiLayerPerceptron_Linux.so")  # For Linux
+    myDll = cdll.LoadLibrary(path + "/Implementation/MLP/Librairie/Linux/MultiLayerPerceptron_Linux.so")  # For Linux
 else:
     raise ValueError("Error : OS is not supported")
 
 
 def init(neurons):
-    neuron_size = len(neurons)
-    neuron_pointer = (c_int32 * neuron_size)(*neurons)
+    neuronSize = len(neurons)
+    neuronPointer = (c_int32 * neuronSize)(*neurons)
 
-    my_dll.init.argtypes = [
-        POINTER(ARRAY(c_int32, neuron_size)),
+    myDll.init.argtypes = [
+        POINTER(ARRAY(c_int32, neuronSize)),
         c_int32
     ]
 
-    my_dll.init.restype = c_void_p
-    return my_dll.init(neuron_pointer, neuron_size)
+    myDll.init.restype = c_void_p
+    return myDll.init(neuronPointer, neuronSize)
 
 
-def fit_classification(mlp, x_train, y_train, sample_count, epochs, alpha):
-    x_train_final = (c_double * len(x_train))(*x_train)
-    y_train_final = (c_double * len(y_train))(*y_train)
+def fit_classification(mlp, XTrain, YTrain, sampleCount, epochs, alpha):
 
-    my_dll.fit_classification.argtypes = [
+    lenX = len(XTrain)
+    lenY = len(YTrain)
+    XTrainFinal = (c_double * lenX)(*XTrain)
+    YTrainFinal = (c_double * lenY)(*YTrain)
+
+    myDll.fit_classification.argtypes = [
         c_void_p,
-        POINTER(ARRAY(c_double, len(x_train))),
-        POINTER(ARRAY(c_double, len(y_train))),
+        POINTER(ARRAY(c_double, lenX)),
+        POINTER(ARRAY(c_double, lenY)),
         c_int32,
         c_int32,
         c_double
     ]
 
-    my_dll.fit_classification.restype = c_void_p
-    return my_dll.fit_classification(mlp, x_train_final, y_train_final, sample_count, epochs, alpha)
+    myDll.fit_classification.restype = c_void_p
+    return myDll.fit_classification(mlp, XTrainFinal, YTrainFinal, sampleCount, epochs, alpha)
 
 
-def fit_regression(mlp, x_train, y_train, sample_count, epochs, alpha):
-    c_x_train = (c_double * len(x_train))(*x_train)
-    c_y_train = (c_double * len(y_train))(*y_train)
+def fit_regression(mlp, XTrain, YTrain, sampleCount, epochs, alpha):
 
-    my_dll.fit_regression.argtypes = [
+    lenX = len(XTrain)
+    lenY = len(YTrain)
+    XTrainFinal = (c_double * lenX)(*XTrain)
+    YTrainFinal = (c_double * lenY)(*YTrain)
+
+    myDll.fit_regression.argtypes = [
         c_void_p,
-        POINTER(ARRAY(c_double, len(x_train))),
-        POINTER(ARRAY(c_double, len(y_train))),
+        POINTER(ARRAY(c_double, lenX)),
+        POINTER(ARRAY(c_double, lenY)),
         c_int32,
         c_int32,
         c_double
     ]
 
-    my_dll.fit_regression.restype = c_void_p
-    return my_dll.fit_regression(mlp, c_x_train, c_y_train, sample_count, epochs, alpha)
+    myDll.fit_regression.restype = c_void_p
+    return myDll.fit_regression(mlp, XTrainFinal, YTrainFinal, sampleCount, epochs, alpha)
 
 
-def predict(mlp, x_to_predict, n):
-    c_x_to_predict = (c_double * len(x_to_predict))(*x_to_predict)
+def predict(mlp, xToPredict, N):
+    pointr = (c_double * len(xToPredict))(*xToPredict)
 
-    my_dll.predict.argtypes = [
+    myDll.predict.argtypes = [
         c_void_p,
-        POINTER(ARRAY(c_double, len(x_to_predict))),
+        POINTER(ARRAY(c_double, len(xToPredict))),
     ]
 
-    my_dll.predict.restype = POINTER(c_double)
-    predictions = my_dll.predict(mlp, c_x_to_predict)
-    return [predictions[i] for i in range(n[-1])]
+    myDll.predict.restype = POINTER(c_double)
+    predictions = myDll.predict(mlp, pointr)
+    return [predictions[i] for i in range(N[-1])]
