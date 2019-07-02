@@ -71,6 +71,9 @@ function uploadFormData(image) {
 	let formData = new FormData();
 	formData.append('image', image);
 
+	let modelName = $('#modelName').val();
+	formData.append('modelName', modelName);
+
 	$.ajax({
 		url: "/upload",
 		type: "POST",

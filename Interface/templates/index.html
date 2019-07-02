@@ -10,6 +10,13 @@
     {% csrf_token %}
     <input type="file" id="inputFile" style="position: absolute; top: -500px;">
 
+    <select name="modelName" id="modelName" style="position: absolute; top: 0; left: 0; margin: 10px; height: 30px;">
+        <option value="default">Veuillez séléctionner un modèle à charger</option>
+        <option value="model_linear_010719_2205">model_linear_010719_2205</option>
+        <option value="model_linear_310619_1802">model_linear_310619_1802</option>
+        <option value="model_linear_100619_1432">model_linear_100619_1432</option>
+    </select>
+
     <div id="img-preview">
         <img src="" alt="uploaded image" height="400" width="auto">
     </div>
