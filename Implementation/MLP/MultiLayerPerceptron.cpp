@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <cmath>
 #include <iostream>
+#include <ctime>
 
 struct MLP{
     int* npl; // Neuron per layers
