@@ -7,4 +7,5 @@ Implementation/Rosenblatt/__pycache__/
 Implementation/MLP/__pycache__/
 *.pyc
 Implementation/MLP/.ipynb_checkpoints/
-
+Interface/application/__pycache__
+Interface/decoder/__pycache__
