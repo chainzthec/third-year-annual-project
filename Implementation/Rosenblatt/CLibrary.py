@@ -4,7 +4,9 @@
 
 from ctypes import *
 
-myDll = cdll.LoadLibrary("./Rosenblatt.so")
+myDll = cdll.LoadLibrary("./Librairie/Mac/Rosenblatt_Mac.so")  # For Mac
+# myDll = cdll.LoadLibrary("./Librairie/Linux/Rosenblatt_Linux.so")  # For Linux
+# myDll = cdll.LoadLibrary("./Librairie/Windows/Rosenblatt_Windows.dll")  # For Windows
 
 
 def create_linear_model(inputCountPerSample):
@@ -14,11 +16,14 @@ def create_linear_model(inputCountPerSample):
     return createdModel
 
 
-def fit_classification(WPointer, XTrain, YTrain, alpha, epochs):
+def fit_classification(WPointer, XTrain, YTrain, alpha, epochs, inputCountPerSample=False):
+
     XTrainPointer = (c_double * len(XTrain))(*XTrain)
     YTrainPointer = (c_double * len(YTrain))(*YTrain)
 
-    inputCountPerSample = int(len(XTrain) / len(YTrain))
+    if not inputCountPerSample:
+        inputCountPerSample = int(len(XTrain) / len(YTrain))
+
     sampleCount = int(len(XTrain) / inputCountPerSample)
 
     myDll.fit_classification.argtypes = [
@@ -50,11 +55,13 @@ def predict_classification(WPointer, value):
     return myDll.predict_classification(WPointer, valuePointer, inputCountPerSample, True)
 
 
-def fit_regression(WPointer, XTrain, YTrain):
+def fit_regression(WPointer, XTrain, YTrain, inputCountPerSample=False):
     XTrainPointer = (c_double * len(XTrain))(*XTrain)
     YTrainPointer = (c_double * len(YTrain))(*YTrain)
 
-    inputCountPerSample = int(len(XTrain) / len(YTrain))
+    if not inputCountPerSample:
+        inputCountPerSample = int(len(XTrain) / len(YTrain))
+
     sampleCount = int(len(XTrain) / inputCountPerSample)
 
     myDll.fit_regression.argtypes = [
@@ -65,7 +72,7 @@ def fit_regression(WPointer, XTrain, YTrain):
         c_int32
     ]
 
-    myDll.fit_regression.restype = POINTER(ARRAY(c_double, inputCountPerSample + 1))
+    myDll.fit_regression.restype = c_void_p
     return myDll.fit_regression(WPointer, XTrainPointer, YTrainPointer, sampleCount, inputCountPerSample)
 
 

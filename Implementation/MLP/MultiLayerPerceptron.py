@@ -8,26 +8,50 @@ def main():
     epochs = 50000
     alpha = 0.001
 
-    N = [2, 2, 1]
+    # N = [2, 2, 1]
+    #
+    # X = [
+    #     0, 0,
+    #     1, 0,
+    #     0, 1,
+    #     1, 1
+    # ]
+    #
+    # Y = [1, -1, -1, 1]
+    #
+    # sampleCount = int(len(X) - len(Y))
+    #
+    # mlp = CLib.init(N)
+    # mlp = CLib.fit_regression(mlp, X, Y, sampleCount, epochs, alpha)
+    #
+    # predictions = CLib.predict(mlp, [0, 0], N)
+    # print(predictions)
+    #
+    # predictions = CLib.predict(mlp, [1, 0], N)
+    # print(predictions)
+    #
+    # predictions = CLib.predict(mlp, [0, 1], N)
+    # print(predictions)
+    #
+    # predictions = CLib.predict(mlp, [1, 1], N)
+    # print(predictions)
+
+    N = [1, 1]
 
     X = [
-        0, 0,
-        1, 0,
-        0, 1,
-        1, 1
+        1,
+        2
     ]
 
-    Y = [1, -1, -1, 1]
+    Y = [2, 3]
 
-    inputCountPerSample = int(len(X) / len(Y))
-    sampleCount = int(len(Y))
+    sampleCount = 2
 
-    XTrainFinal = CLib.init_XTrain(X, sampleCount, inputCountPerSample)
-    YTrainFinal = CLib.init_YTrain(Y, sampleCount)
+    mlp = CLib.init(N)
+    mlp = CLib.fit_regression(mlp, X, Y, sampleCount, epochs, alpha)
 
-    mlp = CLib.fit(N, XTrainFinal, YTrainFinal, sampleCount, epochs, alpha)
-
-    # predictions = CLib.predict(mlp, [0, 0])
+    predictions = CLib.predict(mlp, [1], N)
+    print(predictions)
 
 
 if __name__ == "__main__":

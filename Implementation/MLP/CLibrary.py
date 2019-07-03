@@ -4,67 +4,72 @@
 
 from ctypes import *
 
-myDll = cdll.LoadLibrary("./MultiLayerPerceptron.so")
+myDll = cdll.LoadLibrary("./Librairie/Mac/MultiLayerPerceptron_Mac.so")  # For Mac
+# myDll = cdll.LoadLibrary("./Librairie/Linux/MultiLayerPerceptron_Linux.so")  # For Linux
+# myDll = cdll.LoadLibrary("./Librairie/Windows/MultiLayerPerceptron_Windows.dll")  # For Windows
 
 
-def init_XTrain(XTrain, sampleCount, inputCountPerSample):
-    XTrainPointer = convertToMatrix(XTrain, sampleCount, inputCountPerSample)
-
-    myDll.addMatrixBias.argtypes = [
-        c_void_p,
-        c_int32,
-        c_int32
-    ]
-    myDll.addMatrixBias.restype = c_void_p
-    return myDll.addMatrixBias(XTrainPointer, sampleCount, inputCountPerSample)
-
-
-def init_YTrain(YTrain, sampleCount):
-    return convertToMatrix(YTrain, sampleCount, 1)
-
-
-def convertToMatrix(tab, sampleCount, inputCountPerSample):
-    tabPointer = (c_double * len(tab))(*tab)
-    myDll.convertToMatrix.argtypes = [
-        POINTER(ARRAY(c_double, len(tab))),
-        c_int32,
-        c_int32
-    ]
-
-    myDll.convertToMatrix.restype = c_void_p
-    return myDll.convertToMatrix(tabPointer, sampleCount, inputCountPerSample)
-
-
-def fit(neurons, XTrainFinal, YTrainFinal, sampleCounts, epochs, alpha):
-
+def init(neurons):
     neuronSize = len(neurons)
-    neuronPointer = (c_double * neuronSize)(*neurons)
+    neuronPointer = (c_int32 * neuronSize)(*neurons)
 
-    myDll.fit.argtypes = [
-        POINTER(ARRAY(c_double, len(neurons))),
-        c_int32,
+    myDll.init.argtypes = [
+        POINTER(ARRAY(c_int32, neuronSize)),
+        c_int32
+    ]
+
+    myDll.init.restype = c_void_p
+    return myDll.init(neuronPointer, neuronSize)
+
+
+def fit_classification(mlp, XTrain, YTrain, sampleCount, epochs, alpha):
+
+    lenX = len(XTrain)
+    lenY = len(YTrain)
+    XTrainFinal = (c_double * lenX)(*XTrain)
+    YTrainFinal = (c_double * lenY)(*YTrain)
+
+    myDll.fit_classification.argtypes = [
         c_void_p,
-        c_void_p,
+        POINTER(ARRAY(c_double, lenX)),
+        POINTER(ARRAY(c_double, lenY)),
         c_int32,
         c_int32,
         c_double
     ]
 
-    myDll.fit.restype = c_void_p
-    return myDll.fit(neuronPointer, neuronSize, XTrainFinal, YTrainFinal, sampleCounts, epochs, alpha)
+    myDll.fit_classification.restype = c_void_p
+    return myDll.fit_classification(mlp, XTrainFinal, YTrainFinal, sampleCount, epochs, alpha)
 
 
-def predict(mlp, xToPredict):
-    inputCountPerSample = len(xToPredict)
-    pointr = (c_double * inputCountPerSample)(*xToPredict)
+def fit_regression(mlp, XTrain, YTrain, sampleCount, epochs, alpha):
+
+    lenX = len(XTrain)
+    lenY = len(YTrain)
+    XTrainFinal = (c_double * lenX)(*XTrain)
+    YTrainFinal = (c_double * lenY)(*YTrain)
+
+    myDll.fit_regression.argtypes = [
+        c_void_p,
+        POINTER(ARRAY(c_double, lenX)),
+        POINTER(ARRAY(c_double, lenY)),
+        c_int32,
+        c_int32,
+        c_double
+    ]
+
+    myDll.fit_regression.restype = c_void_p
+    return myDll.fit_regression(mlp, XTrainFinal, YTrainFinal, sampleCount, epochs, alpha)
+
+
+def predict(mlp, xToPredict, N):
+    pointr = (c_double * len(xToPredict))(*xToPredict)
 
     myDll.predict.argtypes = [
         c_void_p,
-        POINTER(ARRAY(c_double, inputCountPerSample)),
-        c_int32,
+        POINTER(ARRAY(c_double, len(xToPredict))),
     ]
 
-    myDll.predict.restype = c_void_p
-    return myDll.predict(mlp, pointr, inputCountPerSample)
-
-
+    myDll.predict.restype = POINTER(c_double)
+    predictions = myDll.predict(mlp, pointr)
+    return [predictions[i] for i in range(N[-1])]
