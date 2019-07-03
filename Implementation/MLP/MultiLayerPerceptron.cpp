@@ -143,27 +143,6 @@ SUPEREXPORT MLP* init(const int* neurons, int size){
     return mlp;
 }
 
-SUPEREXPORT void feedFoward(MLP* mlp){
-    for (int l = 1; l < mlp->layer_count; l++) {
-
-        mlp->X[l] = new double[mlp->npl[l] + 1];
-        mlp->X[l][0] = 1;
-
-        int prev_neuron_count = mlp->npl[l - 1] + 1; //+1 pour le biais
-        int cur_neuron_count = mlp->npl[l] + 1;
-
-        for (int j = 1; j < cur_neuron_count; j++) { //+1 pour le biais
-            double val = 0;
-
-            for (int i = 0; i < prev_neuron_count; i++) {
-                val += (mlp->W[l][i][j] * mlp->X[l - 1][i]);
-            }
-
-            mlp->X[l][j] = tanh(val);
-        }
-    }
-}
-
 SUPEREXPORT double sommWxDelta(const double* w, int cur_neuron_count, const double* delta){
     double res = 0;
     for (int j = 1; j < cur_neuron_count; j++) {
@@ -220,13 +199,37 @@ SUPEREXPORT void destroy(struct MLP* mlp) {
     }
 }
 
-SUPEREXPORT double* predict(MLP* mlp, double* XtoPred){
-//    std::cout << "------- Test -------" << std::endl;
+SUPEREXPORT void feedFoward(MLP* mlp, bool isClassif){
+    for (int l = 1; l < mlp->layer_count; l++) {
+
+        mlp->X[l] = new double[mlp->npl[l] + 1];
+        mlp->X[l][0] = 1;
+
+        int prev_neuron_count = mlp->npl[l - 1] + 1; //+1 pour le biais
+        int cur_neuron_count = mlp->npl[l] + 1;
+
+        for (int j = 1; j < cur_neuron_count; j++) { //+1 pour le biais
+            double val = 0;
+
+            for (int i = 0; i < prev_neuron_count; i++) {
+                val += (mlp->W[l][i][j] * mlp->X[l - 1][i]);
+            }
+
+            if(l != mlp->lastLayerIndex or isClassif){
+                mlp->X[l][j] = tanh(val);
+            }else{
+                mlp->X[l][j] = val;
+            }
+        }
+    }
+}
+
+SUPEREXPORT double* predict(MLP* mlp, double* XtoPred, bool isClassif = false){
 
     int inputCountPerSample = mlp->npl[0];
     double* XtoPredWithBias = addBias(XtoPred, inputCountPerSample);
     mlp->X[0] = XtoPredWithBias;
-    feedFoward(mlp);
+    feedFoward(mlp, isClassif);
 
     int last_layer_neuron_count = mlp->npl[mlp->lastLayerIndex];
     auto* res = new double[last_layer_neuron_count];
@@ -254,7 +257,13 @@ SUPEREXPORT MLP* fit_classification(MLP* mlp, double* XTrain, double* YTrain, in
         for (int i = 0; i < sampleCount; i++) {
 
             mlp->X[0] = XTrainFinal[i];
-            feedFoward(mlp);
+            feedFoward(mlp, true);
+
+            int l = mlp->lastLayerIndex;
+            int cur_neuron_count = mlp->npl[l] + 1;
+            for (int j = 1; j < cur_neuron_count; j++) {
+                mlp->X[l][j] = tanh(mlp->X[l][j]);
+            }
 
             initLastDelta_classification(mlp, mlp->lastLayerIndex, YTrainFinal[i]);
             initAllDeltaExceptLast(mlp, mlp->lastLayerIndex);
@@ -268,18 +277,18 @@ SUPEREXPORT MLP* fit_classification(MLP* mlp, double* XTrain, double* YTrain, in
 SUPEREXPORT MLP* fit_regression(MLP* mlp, double* XTrain, double* YTrain, int sampleCount, int epochs, double alpha) {
 
     int startNeuron = mlp->npl[0];
-    int endNeuron = mlp->npl[mlp->lastLayerIndex - 1];
+    int endNeuron = mlp->npl[mlp->lastLayerIndex];
 
     double** XTrainFinal = convertToMatrix(XTrain, sampleCount, startNeuron);
-    XTrainFinal = addMatrixBias(XTrainFinal, sampleCount, endNeuron);
+    XTrainFinal = addMatrixBias(XTrainFinal, sampleCount, startNeuron);
 
-    double** YTrainFinal = convertToMatrix(YTrain, sampleCount, 1);
+    double** YTrainFinal = convertToMatrix(YTrain, sampleCount, endNeuron);
 
     for (int e = 0; e < epochs; e++) {
         for (int i = 0; i < sampleCount; i++) {
 
             mlp->X[0] = XTrainFinal[i];
-            feedFoward(mlp);
+            feedFoward(mlp, false);
 
             initLastDelta_regression(mlp, mlp->lastLayerIndex, YTrainFinal[i]);
             initAllDeltaExceptLast(mlp, mlp->lastLayerIndex);
@@ -294,68 +303,37 @@ int main() {
 
     // Init
 
-    int sampleCount = 4;
-    double alpha = 0.001;
-    int epochs = 50000;
+    int sampleCount = 3;
+    double alpha = 0.01;
+    int epochs = 10000;
 
-    double XTrain[8] = {
-            0, 0,
-            1, 0,
-            0, 1,
-            1, 1
+    double XTrain[3] = {
+            1,
+            2,
+            3
     };
-    double YTrain[4] = {1, -1, -1, 1};
+    double YTrain[3] = {
+            2,
+            3,
+            2.5
+    };
 
-    // MLP implemtation
+    // MLP implementation
 
-    int neurons[3] = {2, 2, 1};
+    int neurons[3] = {1, 4, 1};
     MLP* mlp = init(neurons, 3);
 
-    mlp = fit_classification(mlp, XTrain, YTrain, sampleCount, epochs, alpha);
+    mlp = fit_regression(mlp, XTrain, YTrain, sampleCount, epochs, alpha);
 
-//    double XtoPred1[2] = {0, 0};
-//    auto* res = predict(mlp, XtoPred1);
-//
-//    for (int i = 0; i < 3; ++i) {
-//        std::cout << res[i] << " ";
-//    }
+    // Results :
 
-//    double XtoPred2[2] = {1, 0};
-//    predict(mlp, XtoPred2);
-//
-//    double XtoPred3[2] = {0, 1};
-//    predict(mlp, XtoPred3);
-//
-//    double XtoPred4[2] = {1, 1};
-//    predict(mlp, XtoPred4);
+    double XtoPred1[1] = {2};
+    auto* res = predict(mlp, XtoPred1, false);
+    for (int i = 0; i < sampleCount; ++i) {
+        std::cout << res[i] << " ";
+    }
 
-//    std::cout << "-------------------" << std::endl;
-//    displayAllWValues(mlp);
 
-//    std::cout << "\n";
-//
-//    for (double i = 1; i >= -0.05; i-=0.05) {
-//
-//        printf("%4.2f > ", i);
-//        for (double j = 0; j <= 1.05; j+=0.05) {
-//
-//            double XtoPred[2] = {i, j};
-//            feedFoward(mlp);
-//
-//            auto* values = predict(mlp, XtoPred);
-//
-//            std::cout << " " << values[0];
-//
-//            if( values[0] > 0 )
-//                std::cout << " x ";
-//            else
-//                std::cout << " - ";
-//
-//        }
-//        std::cout << "\n";
-//    }
-//
-//    destroy(mlp);
 }
 
 

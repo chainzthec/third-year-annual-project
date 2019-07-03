@@ -62,14 +62,15 @@ def fit_regression(mlp, XTrain, YTrain, sampleCount, epochs, alpha):
     return myDll.fit_regression(mlp, XTrainFinal, YTrainFinal, sampleCount, epochs, alpha)
 
 
-def predict(mlp, xToPredict, N):
+def predict(mlp, xToPredict, N, isClassif = False):
     pointr = (c_double * len(xToPredict))(*xToPredict)
 
     myDll.predict.argtypes = [
         c_void_p,
         POINTER(ARRAY(c_double, len(xToPredict))),
+        c_bool
     ]
 
     myDll.predict.restype = POINTER(c_double)
-    predictions = myDll.predict(mlp, pointr)
+    predictions = myDll.predict(mlp, pointr, isClassif)
     return [predictions[i] for i in range(N[-1])]
