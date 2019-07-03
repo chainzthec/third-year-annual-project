@@ -4,7 +4,6 @@
 
 #if _WIN32
     #define SUPEREXPORT __declspec(dllexport)
-    #include <ctime>
 #else
     #define SUPEREXPORT
 #endif
