@@ -1,9 +1,34 @@
 #
-# Created by Baptiste Vasseur on 2019-05-27.
+# [27/05/2019] Created by Baptiste Vasseur
+# [30/06/2019] Modified by Théo Huchard
 #
 
 from ctypes import *
+import platform as pf
+import json
+import os
 
+my_file = open("../settings.json", "r")
+path = json.load(my_file)['projet_path'].replace("\\", "/")
+my_file.close()
+os_name = pf.system()
+
+if os_name == "Darwin":
+    myDll = cdll.LoadLibrary(path + "/Implementation/MLP/Librairie/Mac/MultiLayerPerceptron_Mac.so")  # For Mac
+elif os_name == "Windows":
+    myDll = cdll.LoadLibrary(
+        path + "/Implementation/MLP/Librairie/Windows/MultiLayerPerceptron_Windows.dll")  # For Windows
+elif os_name == "Linux":
+    myDll = cdll.LoadLibrary(path + "/Implementation/MLP/Librairie/Linux/MultiLayerPerceptron_Linux.so")  # For Linux
+else:
+    raise ValueError("Error : OS is not supported")
+
+
+def init(neurons):
+    neuronSize = len(neurons)
+    neuronPointer = (c_int32 * neuronSize)(*neurons)
+
+<<<<<<< HEAD
 myDll = cdll.LoadLibrary("./Librairie/Mac/MultiLayerPerceptron_Mac.so")  # For Mac
 # myDll = cdll.LoadLibrary("./Librairie/Linux/MultiLayerPerceptron_Linux.so")  # For Linux
 # myDll = cdll.LoadLibrary("./Librairie/Windows/MultiLayerPerceptron_Windows.dll")  # For Windows
@@ -13,6 +38,8 @@ def init(neurons):
     neuronSize = len(neurons)
     neuronPointer = (c_int32 * neuronSize)(*neurons)
 
+=======
+>>>>>>> master
     myDll.init.argtypes = [
         POINTER(ARRAY(c_int32, neuronSize)),
         c_int32
@@ -72,4 +99,8 @@ def predict(mlp, xToPredict, N):
 
     myDll.predict.restype = POINTER(c_double)
     predictions = myDll.predict(mlp, pointr)
+<<<<<<< HEAD
     return [predictions[i] for i in range(N[-1])]
+=======
+    return [predictions[i] for i in range(N[-1])]
+>>>>>>> master

@@ -1,5 +1,0 @@
-python google_images_download.py -k "french flag" --limit 500 --output_directory ./dl --thumbnail --chromedriver ./chromedriver --related_image
-
-open /Users/baptiste/Library/Application\ Support/JetBrains/Toolbox/apps/PyCharm-P/ch-0/191.6183.50/PyCharm.app
-
-g++ -c -std=c++17 Rosenblatt.cpp -o Rosenblatt.o && g++ -shared -Wl -o Rosenblatt.so Rosenblatt.o
