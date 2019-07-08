@@ -1,0 +1,1 @@
+{"model": [-0.3999843472614812, 0.2630755762863326, 0.7112106443900663], "inputCountPerSample": 2, "sampleCount": 13, "type": "classification", "alpha": 0.1, "epochs": 10000}

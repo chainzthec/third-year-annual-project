@@ -1,12 +1,33 @@
 #
 # Created by Baptiste Vasseur on 2019-05-18.
 #
-
+import os
+import sys
 from ctypes import *
 
-myDll = cdll.LoadLibrary("./Librairie/Mac/Rosenblatt_Mac.so")  # For Mac
-# myDll = cdll.LoadLibrary("./Librairie/Linux/Rosenblatt_Linux.so")  # For Linux
-# myDll = cdll.LoadLibrary("./Librairie/Windows/Rosenblatt_Windows.dll")  # For Windows
+
+def get_platform():
+    platforms = {
+        'linux1': 'Linux',
+        'linux2': 'Linux',
+        'darwin': 'OSX',
+        'win32': 'Windows'
+    }
+    if sys.platform not in platforms:
+        return sys.platform
+
+    return platforms[sys.platform]
+
+
+dirname = os.path.dirname(__file__)
+if get_platform() == "OSX":
+    myDll = cdll.LoadLibrary(os.path.join(dirname, 'Librairie/Mac/Rosenblatt_Mac.so'))  # For Mac
+
+elif get_platform() == "Linux":
+    myDll = cdll.LoadLibrary(os.path.join(dirname, 'Librairie/Linux/Rosenblatt_Linux.so'))  # For Linux
+
+elif get_platform() == "Windows":
+    myDll = cdll.LoadLibrary(os.path.join(dirname, 'Librairie/Windows/Rosenblatt_Windows.so'))  # For Windows
 
 
 def create_linear_model(inputCountPerSample):
@@ -36,16 +57,25 @@ def fit_classification(WPointer, XTrain, YTrain, alpha, epochs, inputCountPerSam
         c_int32
     ]
 
-    myDll.fit_classification.restype = POINTER(ARRAY(c_double, inputCountPerSample + 1))
-    return myDll.fit_classification(WPointer, XTrainPointer, YTrainPointer, sampleCount, inputCountPerSample, alpha, epochs)
+    myDll.fit_classification.restype = POINTER(c_double)
+    result = myDll.fit_classification(WPointer, XTrainPointer, YTrainPointer, sampleCount, inputCountPerSample, alpha, epochs)
+
+    values = []
+    for i in range(inputCountPerSample + 1):
+        values.append(result[i])
+
+    return {"model": values, "inputCountPerSample": inputCountPerSample, "sampleCount": sampleCount,
+            'type': 'rosenblatt', 'liner_type': 'classification', "alpha": alpha, 'epochs': epochs}
 
 
-def predict_classification(WPointer, value):
+def predict_classification(W, value):
     inputCountPerSample = len(value)
     valuePointer = (c_double * len(value))(*value)
 
+    WPointer = (c_double * len(W))(*W)
+
     myDll.predict_regression.argtypes = [
-        POINTER(ARRAY(c_double, inputCountPerSample + 1)),
+        POINTER(ARRAY(c_double, len(W))),
         POINTER(ARRAY(c_double, len(value))),
         c_int32,
         c_bool
@@ -72,16 +102,25 @@ def fit_regression(WPointer, XTrain, YTrain, inputCountPerSample=False):
         c_int32
     ]
 
-    myDll.fit_regression.restype = c_void_p
-    return myDll.fit_regression(WPointer, XTrainPointer, YTrainPointer, sampleCount, inputCountPerSample)
+    myDll.fit_regression.restype = POINTER(c_double)
+    result = myDll.fit_regression(WPointer, XTrainPointer, YTrainPointer, sampleCount, inputCountPerSample)
+
+    values = []
+    for i in range(inputCountPerSample + 1):
+        values.append(result[i])
+
+    return {"model": values, "inputCountPerSample": inputCountPerSample, "sampleCount": sampleCount,
+            'type': 'rosenblatt', 'liner_type': 'regression'}
 
 
-def predict_regression(WPointer, value):
+def predict_regression(W, value):
     inputCountPerSample = len(value)
     valuePointer = (c_double * len(value))(*value)
 
+    WPointer = (c_double * len(W))(*W)
+
     myDll.predict_regression.argtypes = [
-        POINTER(ARRAY(c_double, inputCountPerSample + 1)),
+        POINTER(ARRAY(c_double, len(W))),
         POINTER(ARRAY(c_double, len(value))),
         c_int32,
         c_bool
@@ -91,32 +130,9 @@ def predict_regression(WPointer, value):
     return myDll.predict_regression(WPointer, valuePointer, inputCountPerSample, True)
 
 
-def delete_linear_model(W, length):
-    WPointer = (c_double * length)(*W)
-
-    myDll.delete_linear_model.argtype = POINTER(ARRAY(c_double, length))
-    myDll.delete_linear_model.restype = c_void_p
-    myDll.delete_linear_model(WPointer)
+def export(model):
+    return model
 
 
-def displayMatrix(pointerVal, rows, cols):
-
-    myDll.displayMatrix.argtypes = [
-        POINTER(ARRAY(c_double, cols * rows)),
-        c_int32,
-        c_int32
-    ]
-
-    myDll.displayMatrix.restype = c_void_p
-    myDll.displayMatrix(pointerVal, rows, cols)
-
-
-def launchClassificationText(model, value, expected):
-    res = predict_classification(model, value)
-    print("- Prediction des points "+str(value)+"  :  ("+str(expected)+") -> (" + str(int(res)) + ")")
-
-
-def launchRegressionText(model, value, expected):
-    res = predict_regression(model, value)
-    print("- Prediction des points "+str(value)+"  :  ("+str(expected)+") -> (" + str(int(res)) + ")")
-
+def create(content):
+    return None
