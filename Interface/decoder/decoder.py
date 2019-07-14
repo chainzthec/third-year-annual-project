@@ -1,12 +1,11 @@
 import sys
 
+sys.path.append("..")
+
 import cv2
 import numpy as np
 from PIL import Image
-
 from application.wsgi import application
-
-sys.path.append("..")
 import Implementation.Utils as Utils
 
 
@@ -42,7 +41,7 @@ def launch_traitment(image, model_name):
 
 
 def load_model(model_name):
-    model = load(model_name)
+    model = Utils.load(model_name)
     print(model_name + ' loaded')
 
     # call load model func from utils.py
