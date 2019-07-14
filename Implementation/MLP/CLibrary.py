@@ -45,22 +45,20 @@ def init(neurons):
 
 
 def fit_classification(mlp, XTrain, YTrain, sampleCount, epochs, alpha):
-    lenX = len(XTrain)
-    lenY = len(YTrain)
-    XTrainFinal = (c_double * lenX)(*XTrain)
-    YTrainFinal = (c_double * lenY)(*YTrain)
+    XTrainPointer = (c_double * len(XTrain))(*XTrain)
+    YTrainPointer = (c_double * len(YTrain))(*YTrain)
 
     myDll.fit_classification.argtypes = [
         c_void_p,
-        POINTER(ARRAY(c_double, lenX)),
-        POINTER(ARRAY(c_double, lenY)),
+        POINTER(ARRAY(c_double, len(XTrain))),
+        POINTER(ARRAY(c_double, len(YTrain))),
         c_int32,
         c_int32,
         c_double
     ]
 
     myDll.fit_classification.restype = c_void_p
-    return myDll.fit_classification(mlp, XTrainFinal, YTrainFinal, sampleCount, epochs, alpha)
+    return myDll.fit_classification(mlp, XTrainPointer, YTrainPointer, sampleCount, epochs, alpha)
 
 
 def fit_regression(mlp, XTrain, YTrain, sampleCount, epochs, alpha):

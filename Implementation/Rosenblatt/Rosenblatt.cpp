@@ -137,7 +137,7 @@ SUPEREXPORT double predict(
         res = res + (W[j] * XLineToPredict[j]);
     }
 
-    return sign(res) ;
+    return res ;
 }
 
 SUPEREXPORT double predict_regression(
@@ -155,7 +155,7 @@ SUPEREXPORT double predict_classification(
         int inputCountPerSample,
         bool predictState = true
 ) {
-    return predict(W, XLineToPredict, inputCountPerSample, predictState);
+    return sign(predict(W, XLineToPredict, inputCountPerSample, predictState));
 }
 
 SUPEREXPORT double* fit_regression(
@@ -169,19 +169,12 @@ SUPEREXPORT double* fit_regression(
 
     Matrix<double> XTrainFin = transformDoubleToMatrix(XTrain, sampleCount, inputCountPerSample);
     Matrix<double> YTrainFin = transformDoubleToMatrix(YTrain, sampleCount, 1);
-//    std::cout << "XTrainFin :" << std::endl << XTrainFin << std::endl;
-//    std::cout << "YTrainFin :" << std::endl << YTrainFin << std::endl;
 
     Matrix<double> XTrainTranspose = XTrainFin.getTranspose();
-//    std::cout  << "XtrainTranspose :" << std::endl << XTrainTranspose << std::endl;
 
     Matrix<double> XTmultX = XTrainTranspose * XTrainFin;
-//    std::cout << "XTmultX :" << std::endl << XTmultX << std::endl;
 
     Matrix<double> XTmultXInverse = XTmultX.getInverse();
-//    std::cout << "XTmultXInverse :" << std::endl << XTmultXInverse << std::endl;
-
-//    std::cout << "Return :" << std::endl << XTmultXInverse * XTrainTranspose * YTrain << std::endl;
 
     Matrix<double> res = (XTmultXInverse * XTrainTranspose * YTrainFin).getTranspose();
     return res.convertToDouble();

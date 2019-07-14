@@ -32,13 +32,18 @@ elif get_platform() == "Windows":
 
 def create_linear_model(inputCountPerSample):
     myDll.create_linear_model.argtypes = [c_int32]
-    myDll.create_linear_model.restype = POINTER(ARRAY(c_double, inputCountPerSample + 1))
-    createdModel = myDll.create_linear_model(inputCountPerSample)
-    return createdModel
+    myDll.create_linear_model.restype = POINTER(c_double)
+    result = myDll.create_linear_model(inputCountPerSample)
+
+    values = []
+    for i in range(inputCountPerSample + 1):
+        values.append(result[i])
+
+    return values
 
 
-def fit_classification(WPointer, XTrain, YTrain, alpha, epochs, inputCountPerSample=False):
-
+def fit_classification(W, XTrain, YTrain, alpha, epochs, inputCountPerSample=False):
+    WPointer = (c_double * len(W))(*W)
     XTrainPointer = (c_double * len(XTrain))(*XTrain)
     YTrainPointer = (c_double * len(YTrain))(*YTrain)
 
@@ -68,24 +73,8 @@ def fit_classification(WPointer, XTrain, YTrain, alpha, epochs, inputCountPerSam
             'type': 'rosenblatt', 'liner_type': 'classification', "alpha": alpha, 'epochs': epochs}
 
 
-def predict_classification(W, value):
-    inputCountPerSample = len(value)
-    valuePointer = (c_double * len(value))(*value)
-
+def fit_regression(W, XTrain, YTrain, inputCountPerSample=False):
     WPointer = (c_double * len(W))(*W)
-
-    myDll.predict_regression.argtypes = [
-        POINTER(ARRAY(c_double, len(W))),
-        POINTER(ARRAY(c_double, len(value))),
-        c_int32,
-        c_bool
-    ]
-
-    myDll.predict_classification.restype = c_double
-    return myDll.predict_classification(WPointer, valuePointer, inputCountPerSample, True)
-
-
-def fit_regression(WPointer, XTrain, YTrain, inputCountPerSample=False):
     XTrainPointer = (c_double * len(XTrain))(*XTrain)
     YTrainPointer = (c_double * len(YTrain))(*YTrain)
 
@@ -113,10 +102,29 @@ def fit_regression(WPointer, XTrain, YTrain, inputCountPerSample=False):
             'type': 'rosenblatt', 'liner_type': 'regression'}
 
 
-def predict_regression(W, value):
-    inputCountPerSample = len(value)
-    valuePointer = (c_double * len(value))(*value)
+def predict_classification(model, value):
+    inputCountPerSample = model['inputCountPerSample']
+    W = model['model']
 
+    valuePointer = (c_double * len(value))(*value)
+    WPointer = (c_double * len(W))(*W)
+
+    myDll.predict_regression.argtypes = [
+        POINTER(ARRAY(c_double, len(W))),
+        POINTER(ARRAY(c_double, len(value))),
+        c_int32,
+        c_bool
+    ]
+
+    myDll.predict_classification.restype = c_double
+    return myDll.predict_classification(WPointer, valuePointer, inputCountPerSample, True)
+
+
+def predict_regression(model, value):
+    inputCountPerSample = model['inputCountPerSample']
+    W = model['model']
+
+    valuePointer = (c_double * len(value))(*value)
     WPointer = (c_double * len(W))(*W)
 
     myDll.predict_regression.argtypes = [
@@ -135,4 +143,4 @@ def export(model):
 
 
 def create(content):
-    return None
+    return content

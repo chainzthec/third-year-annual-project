@@ -293,7 +293,9 @@ SUPEREXPORT MLP* fit_classification(MLP* mlp, double* XTrain, double* YTrain, in
 
 
     for (int e = 0; e < epochs; e++) {
+        std::cout << "- Epochs : " << e << " / " << epochs << std::endl;
         for (int i = 0; i < sampleCount; i++) {
+//            std::cout << "      - sampleCount : " << i << " / " << sampleCount << std::endl;
 
             mlp->X[0] = XTrainFinal[i];
             feedFoward(mlp, true);
