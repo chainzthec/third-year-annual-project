@@ -8,8 +8,7 @@ from ctypes import *
 
 def get_platform():
     platforms = {
-        'linux1': 'Linux',
-        'linux2': 'Linux',
+        'linux': 'Linux',
         'darwin': 'OSX',
         'win32': 'Windows'
     }
@@ -28,7 +27,6 @@ elif get_platform() == "Linux":
 
 elif get_platform() == "Windows":
     myDll = cdll.LoadLibrary(os.path.join(dirname, 'Librairie/Windows/Rosenblatt_Windows.so'))  # For Windows
-
 
 def create_linear_model(inputCountPerSample):
     myDll.create_linear_model.argtypes = [c_int32]

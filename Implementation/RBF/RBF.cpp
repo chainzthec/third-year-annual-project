@@ -58,7 +58,7 @@ SUPEREXPORT RBF *naive_rbf_train(double *X, double *Y, int inputCountPerSample, 
     return rbf;
 }
 
-SUPEREXPORT double naive_rbf_predict(RBF *rbf, double *sample) {
+SUPEREXPORT double naive_rbf_regression_predict(RBF *rbf, double *sample) {
     MatrixXd sampleMatrix = Map<MatrixXd>(sample, 1, rbf->X.cols());
     MatrixXd gaussianOutputs(1, rbf->X.rows());
     for (int i = 0; i < rbf->X.rows(); i++) {
@@ -67,15 +67,27 @@ SUPEREXPORT double naive_rbf_predict(RBF *rbf, double *sample) {
     return (gaussianOutputs * rbf->W).sum();
 }
 
-SUPEREXPORT RBF *rbf_train(double *X, double *Y, int inputCountPerSample, int sampleCount, int epochs = 5, int k = 2,
-                           double gamma = 100,
-                           bool useBias = false) {
+SUPEREXPORT int naive_rbf_classification_predict(RBF *rbf, double *sample) {
+    if (naive_rbf_regression_predict(rbf, sample) < 0) {
+        return -1;
+    } else {
+        return 1;
+    }
+}
+
+SUPEREXPORT RBF *rbf_train(
+        double *X,
+        double *Y,
+        int inputCountPerSample,
+        int sampleCount,
+        int epochs = 5,
+        int k = 2,
+        double gamma = 100) {
 
     MatrixXd XMatrix = Map<Matrix<double, Dynamic, Dynamic, RowMajor>>(X, inputCountPerSample, sampleCount);
     MatrixXd YMatrix = Map<MatrixXd>(Y, inputCountPerSample, 1);
     MatrixXd KMatrix = MatrixXd::Random(k, sampleCount);
-    MatrixXd ClosestMatrix = Map<MatrixXd>(XMatrix.data(), inputCountPerSample,
-                                           sampleCount);
+    MatrixXd ClosestMatrix = Map<MatrixXd>(XMatrix.data(), inputCountPerSample, sampleCount);
     RowVectorXd ClosestCenter(sampleCount);
     RowVectorXd AveragePositionCenter(sampleCount);
     RowVectorXd VectorSum;
@@ -156,8 +168,6 @@ SUPEREXPORT RBF *rbf_train(double *X, double *Y, int inputCountPerSample, int sa
     //cout << "\n" << W << endl;
 
 
-
-
     RBF *rbf = initRBF(KMatrix, W, gamma);
     return rbf;
 }
@@ -169,6 +179,28 @@ SUPEREXPORT double rbf_predict(RBF *rbf, double *sample) {
         gaussianOutputs(0, i) = exp((-rbf->gamma) * (pow(((rbf->X.row(i) - sampleMatrix).norm()), 2)));
     }
     return (gaussianOutputs * rbf->W).sum();
+}
+
+SUPEREXPORT double getWSize(RBF *rbf) {
+    int res = 0;
+    for (int l = 0; l < rbf->W.rows(); l++) {
+        res++;
+    }
+    return res;
+}
+
+SUPEREXPORT double *getAllWValues(RBF *rbf) {
+    int size = getWSize(rbf);
+    auto *res = new double[size];
+    for (int i = 0; i < size; i++) {
+        res[i] = rbf->W(i, 0);
+    }
+    return res;
+}
+
+SUPEREXPORT RBF *create(double* WValues, int length){
+    MatrixXd WMatrix = Map<MatrixXd>(WValues, length, 1);
+    return initRBF(WMatrix, WMatrix, 100.0);
 }
 
 int main() {
@@ -299,17 +331,29 @@ int main() {
             0.33028456, 0.44437519, 0.85467176, 0.01071847
     };
 
-    double sample[2] = {0.73287643, 0.84377549};
+    double sample[2] = {0.14216546, 0.46456465};
 
 
-//    RBF *rbfModel = naive_rbf_train(X, Y, 10, 2, 100);
-//    double res = naive_rbf_predict(rbfModel, sample);
-//    cout << res << endl;
+    RBF *rbfModel1 = naive_rbf_train(X, Y, 10, 2, 100);
+    double res1 = naive_rbf_regression_predict(rbfModel1, sample);
+    cout << "RBF Regression predict : " << res1 << endl;
 
-    RBF *rbfModel = rbf_train(X, Y, 100, 2, 1000, 20, 100, false);
-    //double *X, double *Y, int inputCountPerSample, int sampleCount, int epochs = 5, int k = 2,double gamma = 100
-    double res = rbf_predict(rbfModel, sample);
-    cout << res << endl;
+    int signRes = naive_rbf_classification_predict(rbfModel1, sample);
+    cout << "Classification predict : " << signRes << endl;
+
+    cout << "Eigen display" << endl;
+    cout << rbfModel1->W << endl;
+    cout << "My display" << endl;
+    for (int i = 0; i < rbfModel1->W.rows(); i++) {
+        cout << getAllWValues(rbfModel1)[i] << endl;
+    }
+    cout << getWSize(rbfModel1) << endl;
+
+//
+//    RBF *rbfModel2 = rbf_train(X, Y, 100, 2, 1000, 20, 100);
+//    //double *X, double *Y, int inputCountPerSample, int sampleCount, int epochs = 5, int k = 2,double gamma = 100
+//    double res2 = rbf_predict(rbfModel2, sample);
+//    cout << res2 << endl;
 
 
 }

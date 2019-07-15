@@ -30,6 +30,8 @@ Y = [
     0.60782134
 ]
 
+print("Test")
+
 inputCountPerSample = int(len(X) / len(Y))
 sampleCount = 2
 model = CLib.naive_rbf_train(X, Y, inputCountPerSample, sampleCount, 100)

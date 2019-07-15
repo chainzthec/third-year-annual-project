@@ -37,9 +37,9 @@ def fit(
     if method == "MLP_CLASS":
         return mlp_clib.fit_classification(model, x_train, y_train, sample_count, epochs, alpha)
     if method == "RSB_REG":
-        return rosenblatt_clib.fit_classification(rsb_model, X, Y, alpha, epochs)
+        return rosenblatt_clib.fit_classification(model, x_train, y_train, alpha, epochs)
     if method == "RSB_CLASS":
-        return rosenblatt_clib.fit_regression(rsb_model, X, Y)
+        return rosenblatt_clib.fit_regression(model, x_train, y_train)
 
 
 def predict(
@@ -56,5 +56,3 @@ def predict(
         return rosenblatt_clib.predict_regression(model, sample)
     if method == "RSB_CLASS":
         return rosenblatt_clib.predict_classification(model, sample)
-
-

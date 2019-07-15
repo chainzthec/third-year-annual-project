@@ -9,8 +9,7 @@ from ctypes import *
 
 def get_platform():
     platforms = {
-        'linux1': 'Linux',
-        'linux2': 'Linux',
+        'linux': 'Linux',
         'darwin': 'OSX',
         'win32': 'Windows'
     }
@@ -136,7 +135,6 @@ def export(mlp):
 
 
 def create(content):
-
     npl = content['npl']
     layer_count = len(npl)
 
