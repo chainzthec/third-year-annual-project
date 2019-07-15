@@ -6,7 +6,7 @@ from application.wsgi import application
 import cv2
 
 sys.path.append(os.path.abspath(os.path.join(__file__, "../../..")))
-import Implementation.Utils as Utils
+import Utils
 import Implementation.MLP.CLibrary as MLP
 import Implementation.Rosenblatt.CLibrary as ROSENBLATT
 
@@ -44,12 +44,12 @@ def launch_traitment(image, model_name):
     # print(model)
 
     classe = "?"
-    maxindex = val.index(max(res))
-    if maxindex == 1:
+    maxindex = res.index(max(res))
+    if maxindex == 0:
+        classe = "France"
+    elif maxindex == 1:
         classe = "Italie"
     elif maxindex == 2:
-        classe = "France"
-    elif maxindex == 3:
         classe = "Italie"
 
     return {"res": True, 'result': res, 'classe': classe}

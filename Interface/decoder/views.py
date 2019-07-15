@@ -7,9 +7,6 @@ from django.http import JsonResponse
 from decoder.decoder import launch_traitment
 import application
 
-sys.path.append(os.path.abspath(os.path.join(__file__, "../../..")))
-import Implementation.Utils as Utils
-
 
 def home(request):
 
