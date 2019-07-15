@@ -12,7 +12,7 @@ import os
 import time
 
 # import MLP.CLibrary as MLP
-import MLP.CLibrary as MLP
+import Implementation.MLP.CLibrary as MLP
 import Utils
 
 
@@ -41,12 +41,14 @@ def start(path, imgSize=(16, 16)):
             return
 
         if 0 < len(dirList):
-            print("Classes : ", dirList)
 
             for singleDir in dirList:
 
                 list_possibily = [-1] * len(dirList)
                 list_possibily[classe] = 1
+
+                print("Classe :", singleDir, '->', list_possibily)
+
                 fullpath = os.path.join(root, singleDir)
                 filelist = os.listdir(fullpath)
 
@@ -66,7 +68,7 @@ def start(path, imgSize=(16, 16)):
                             continue
                             # print("L'image : " + filename + " du répertoire : " + singleDir + " est inutilisable.")
 
-                print("Dossier " + str(singleDir) + " chargé !")
+                print("     > Dossier " + str(singleDir) + " chargé !")
                 classe += 1
 
     return XTrain, YTrain, imgNb, nbPixPerLine
@@ -85,16 +87,16 @@ if __name__ == "__main__":
 
     print("")
 
-    # N = [3072, 64, 64, 1]
+    # N = [3072, 64, 64, 2]
     # epochs = 100
     # alpha = 0.001
 
-    # N = [3072, 64, 64, 1]
+    # N = [3072, 64, 64, 2]
     # epochs = 1000
     # alpha = 0.001
     #
-    N = [3072, 128, 32, 1]
-    epochs = 500
+    N = [3072, 128, 32, 2]
+    epochs = 100
     alpha = 0.01
 
     start_time = time.time()
@@ -108,6 +110,6 @@ if __name__ == "__main__":
     print("- Durée : %s secondes !" % (end_time - start_time))
     print("")
 
-    # Utils.save(mlpClassif, 'MLP', 'MLP_classification_E100_A0001_N3072_64_64_1')
-    # Utils.save(mlpClassif, 'MLP', 'MLP_classification_E1000_A0001_N3072_64_64_1.model')
-    Utils.save(mlpClassif, 'MLP', 'classification_E500_A001_N3072_256_16_1')
+    # Utils.save(mlpClassif, 'MLP', 'classification_E100_A0001_N3072_64_64_2')
+    # Utils.save(mlpClassif, 'MLP', 'classification_E1000_A0001_N3072_64_64_2.model')
+    Utils.save(mlpClassif, 'MLP', 'classification_E500_A001_N3072_128_16_2')

@@ -4,12 +4,15 @@ import sys
 
 import Implementation.MLP.CLibrary as MLP
 import Implementation.Rosenblatt.CLibrary as ROSENBLATT
+
+# import MLP.CLibrary as MLP
+# import Rosenblatt.CLibrary as ROSENBLATT
 # import RBF.CLibrary as RBF
 
 
 def load(_filename):
     dirname = os.path.dirname(__file__)
-    _filename = os.path.join(dirname, "../Models/" + _filename)
+    _filename = os.path.join(dirname, "Models/" + _filename)
 
     print(_filename)
 
@@ -47,7 +50,7 @@ def save(model, algo_name, _filename):
 
     _fileName = algo_name + "_" + _filename + '.model'
     dirname = os.path.dirname(__file__)
-    _fileName = os.path.join(dirname, "../Models/" + _fileName)
+    _fileName = os.path.join(dirname, "Models/" + _fileName)
 
     file = open(_fileName, "w+")
     file.write(json_val)
