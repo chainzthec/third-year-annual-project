@@ -3,12 +3,15 @@ from io import BytesIO
 from django.shortcuts import render
 from django.http import JsonResponse
 
+import os
 import application
 from application.settings import BASE_DIR
 from decoder.decoder import launchTraitment
 
 
 def home(request):
+    launchTraitment()
+    dataset_folder = os.listdir("/home/eight/Repositories/projet-annuel/Dataset")
     return render(request, 'index.html', locals())
 
 
@@ -31,6 +34,3 @@ def upload(request):
             return JsonResponse({"error": "Erreur ! Type d'image non supportée !"}, status=500)
     else:
         return JsonResponse({"error": "Erreur ! not xmlhttprequest"}, status=500)
-
-
-

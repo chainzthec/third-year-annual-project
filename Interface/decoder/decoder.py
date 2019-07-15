@@ -1,7 +1,10 @@
 import cv2
 import numpy as np
 from PIL import Image
+import sys
 
+sys.path.append("..")  # Adds higher directory to python modules path.
+import Implementation.Utils as Utils
 from application.settings import BASE_DIR
 from application.wsgi import application
 
