@@ -6,7 +6,7 @@ from django.http import JsonResponse
 import os
 import application
 from application.settings import BASE_DIR
-from decoder.decoder import launchTraitment
+from decoder import launchTraitment
 
 
 def home(request):

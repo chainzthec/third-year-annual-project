@@ -3,9 +3,9 @@ import os
 import sys
 import numpy as np
 
-import MLP.CLibrary as MLP
-import Rosenblatt.CLibrary as ROSENBLATT
-import RBF.CLibrary as RBF
+import Implementation.MLP.CLibrary as MLP
+import Implementation.Rosenblatt.CLibrary as ROSENBLATT
+import Implementation.RBF.CLibrary as RBF
 
 
 def load(_fileName):
@@ -26,6 +26,15 @@ def load(_fileName):
 
     return value
 
+
+
+def predict(model, algo_name, XToPredict):
+    if algo_name.upper() == "MLP":
+        return MLP.predict(model, XToPredict, True)
+    elif algo_name.upper() == "ROSENBLATT":
+        return ROSENBLATT.predict_classification(model, XToPredict)
+    elif algo_name.upper() == "RBF":
+        return RBF.naive_rbf_classification_predict(model,XToPredict)
 
 def save(model, typeAlgo, _fileName):
     value = {}

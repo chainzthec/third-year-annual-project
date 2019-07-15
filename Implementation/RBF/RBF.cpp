@@ -353,12 +353,6 @@ int main() {
     }
     cout << getWSize(rbfModel1) << endl;
 
-//
-//    RBF *rbfModel2 = rbf_train(X, Y, 100, 2, 1000, 20, 100);
-//    //double *X, double *Y, int inputCountPerSample, int sampleCount, int epochs = 5, int k = 2,double gamma = 100
-//    double res2 = rbf_predict(rbfModel2, sample);
-//    cout << res2 << endl;
-
 
 }
 
