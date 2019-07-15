@@ -90,7 +90,7 @@ if __name__ == "__main__":
     start_time = time.time()
 
     # MLP_classification_E500_A001_N3072_128_16_2.model
-    _model_name = input('Modèle à charger ? :')
+    _model_name = input('Modèle à charger ? : ')
     model, algo_name = Utils.load(_model_name)
 
     largeur = input("Largeur de l'image ? (par défaut 32) ")

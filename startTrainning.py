@@ -12,6 +12,7 @@ import os
 import time
 
 import Implementation.MLP.MLP as MLP
+import Implementation.Linear.Linear as LINEAR
 import Utils
 
 
@@ -77,31 +78,48 @@ if __name__ == "__main__":
     inputVal = input("Dataset à entrainer : ")
     filepath = inputVal.rstrip(' ') + '/'.replace("\\ ", ' ')
 
-    largeur = input("Largeur de l'image ? (par défaut 32) ")
+    largeur = input("Largeur de l'image ? (par défaut 32) : ")
     largeur = 32 if len(largeur) == 0 else int(largeur)
     size = (largeur, largeur)
 
-    epochs = input("Epochs ? (par défaut 1000) ")
+    epochs = input("Epochs ? (par défaut 1000) : ")
     epochs = 1000 if len(epochs) == 0 else int(epochs)
 
-    alpha = input("Alpha ? (par défaut 0.01) ")
+    alpha = input("Alpha ? (par défaut 0.01) : ")
     alpha = 0.01 if len(alpha) == 0 else float(alpha)
 
+    repeat = True
+    algo_name = ''
+    while repeat:
+        algo_name = input("Algo ? LINEAR, MLP or RBF ? : ")
+        algo_name = algo_name.upper()
+        if algo_name == "LINEAR" or algo_name == "MLP" or algo_name == "RBF":
+            repeat = False
+
     xT, yT, sampleCount, inputCountPerSample = start(filepath, size)
-    N = [inputCountPerSample, 64, 64, 2]
 
     print("")
     print("- Epochs : " + str(epochs))
     print("- Alpha : " + str(alpha))
-    print("- Taille d'une image : ", str(_s) + "x" + str(_s), 'x3 -> ', str(inputCountPerSample))
+    print("- Taille d'une image : ", str(largeur) + "x" + str(largeur), 'x3 -> ', str(inputCountPerSample))
     print("- Nombre d'images : " + str(sampleCount))
 
     print("")
 
     start_time = time.time()
 
-    mlpClassif = MLP.init(N)
-    mlpClassif = MLP.fit_classification(mlpClassif, xT, yT, sampleCount, epochs, alpha)
+    if algo_name == "MLP":
+
+        N = [inputCountPerSample, 64, 64, 2]
+        mlpClassif = MLP.init(N)
+        mlpClassif = MLP.fit_classification(mlpClassif, xT, yT, sampleCount, epochs, alpha)
+        Utils.save(mlpClassif, 'MLP', 'classification_E'+str(epochs)+'_A'+str(alpha)+'_N'+str(N)+'.model')
+
+    elif algo_name == "LINEAR":
+
+        linearClassif = LINEAR.create_linear_model(inputCountPerSample)
+        LINEAR.fit_classification(linearClassif, xT, yT, alpha, epochs, inputCountPerSample)
+        Utils.save(linearClassif, 'LINEAR', 'classification_E'+str(epochs)+'_A'+str(alpha)+'.model')
 
     end_time = time.time()
 
@@ -112,4 +130,3 @@ if __name__ == "__main__":
     # Utils.save(mlpClassif, 'MLP', 'classification_E100_A0001_N3072_64_64_2')
     # Utils.save(mlpClassif, 'MLP', 'classification_E1000_A0001_N3072_64_64_2.model')
     # Utils.save(mlpClassif, 'MLP', 'classification_E500_A001_N3072_128_16_2')
-    Utils.save(mlpClassif, 'MLP', 'classification_E1000_A001_N3072_64_64_2.model')

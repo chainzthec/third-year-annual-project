@@ -43,14 +43,19 @@ def launch_traitment(image, model_name):
     # print(pixel)
     # print(model)
 
-    classe = "?"
-    maxindex = res.index(max(res))
-    if maxindex == 0:
-        classe = "France"
-    elif maxindex == 1:
-        classe = "Italie"
-    elif maxindex == 2:
-        classe = "Italie"
+    if algo_name.upper() == "MLP":
+
+        classe = "?"
+        maxindex = res.index(max(res))
+        if maxindex == 0:
+            classe = "France"
+        elif maxindex == 1:
+            classe = "Italie"
+        elif maxindex == 2:
+            classe = "Congo"
+
+    elif algo_name.upper() == "LINEAR":
+        classe = "ok"
 
     return {"res": True, 'result': res, 'classe': classe}
 
