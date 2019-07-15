@@ -211,6 +211,7 @@ SUPEREXPORT double* fit_classification(
     double** XTrainFin = oneDimToTwo(XTrain, sampleCount, inputCountPerSample);
 
     for (int i = 0; i < epochs; i++) {
+        std::cout << "- Epochs : " << i << " / " << epochs << std::endl;
         for (int j = 0; j < sampleCount; j++) {
             auto tmp = XTrainFin[j];
 
