@@ -1,4 +1,4 @@
-#!/Users/baptiste/Desktop/Cours/ESGI - BACHELOR/AnnualProject3IBD/Interface/venv/bin/python
+#!/Users/baptiste/Desktop/Cours/ESGI/ProjetAnnuel/Interface/venv/bin/python
 from django.core import management
 
 if __name__ == "__main__":
