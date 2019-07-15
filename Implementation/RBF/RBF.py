@@ -24,8 +24,7 @@ if get_platform() == "OSX":
     myDll = cdll.LoadLibrary(os.path.join(dirname, 'Librairie/Mac/RBF_Mac.so'))  # For Mac
 
 elif get_platform() == "Linux":
-    myDll = cdll.LoadLibrary(os.path.join(
-        '/home/eight/Repositories/projet-annuel/Implementation/RBF/Librairie/Linux/RBF_Linux.so'))  # For Linux
+    myDll = cdll.LoadLibrary(os.path.join(dirname, 'Librairie/Linux/RBF_Linux.so'))  # For Linux
 
 elif get_platform() == "Windows":
     myDll = cdll.LoadLibrary(os.path.join(dirname, 'Librairie/Windows/RBF_Linux.dll'))  # For Windows
