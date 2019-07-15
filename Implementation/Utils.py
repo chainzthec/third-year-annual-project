@@ -7,41 +7,50 @@ import Implementation.Rosenblatt.CLibrary as ROSENBLATT
 # import RBF.CLibrary as RBF
 
 
-def load(_fileName):
+def load(_filename):
     dirname = os.path.dirname(__file__)
-    _fileName = os.path.join(dirname, "../../Models/" + _fileName)
+    _filename = os.path.join(dirname, "../Models/" + _filename)
 
-    with open(_fileName, mode='r+') as f:
+    print(_filename)
+
+    with open(_filename, mode='r+') as f:
         content = json.load(f)
 
     value = "Erreur lors du chargement !"
-    typeAlgo = content['type']
-    if typeAlgo.upper() == "MLP":
+    algo_name = content['type']
+    if algo_name.upper() == "MLP":
         value = MLP.create(content)
-    elif typeAlgo.upper() == "ROSENBLATT":
+    elif algo_name.upper() == "ROSENBLATT":
         value = ROSENBLATT.create(content)
 
-    return value
+    return value, algo_name
 
 
-def save(model, typeAlgo, _fileName):
+def predict(model, algo_name, XToPredict):
+    if algo_name.upper() == "MLP":
+        return MLP.predict(model, XToPredict, True)
+    elif algo_name.upper() == "ROSENBLATT":
+        return ROSENBLATT.predict_classification(model, XToPredict)
+
+
+def save(model, algo_name, _filename):
 
     value = {}
-    if typeAlgo.upper() == "MLP":
+    if algo_name.upper() == "MLP":
         value = MLP.export(model)
-    elif typeAlgo.upper() == "ROSENBLATT":
+    elif algo_name.upper() == "ROSENBLATT":
         value = ROSENBLATT.export(model)
-    # elif typeAlgo.upper() == "RBF":
+    # elif algo_name.upper() == "RBF":
         # value = RBF.export(model)
 
-    jsonVal = json.dumps(value)
+    json_val = json.dumps(value)
 
-    _fileName = typeAlgo + "_" + _fileName + '.model'
+    _fileName = algo_name + "_" + _filename + '.model'
     dirname = os.path.dirname(__file__)
     _fileName = os.path.join(dirname, "../Models/" + _fileName)
 
     file = open(_fileName, "w+")
-    file.write(jsonVal)
+    file.write(json_val)
     file.close()
 
     print(_fileName + ' saved')

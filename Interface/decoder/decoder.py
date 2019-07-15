@@ -1,17 +1,17 @@
 import sys
-
-sys.path.append("..")
-
-import cv2
+import os
 import numpy as np
 from PIL import Image
 from application.wsgi import application
+import cv2
+
+sys.path.append(os.path.abspath(os.path.join(__file__, "../../..")))
 import Implementation.Utils as Utils
+import Implementation.MLP.CLibrary as MLP
+import Implementation.Rosenblatt.CLibrary as ROSENBLATT
 
 
 def launch_traitment(image, model_name):
-    print(image)
-
     file = Image.open(image.file)
 
     try:
@@ -20,7 +20,7 @@ def launch_traitment(image, model_name):
         return {'error': 'Erreur lors de la lecture du fichier !'}
 
     try:
-        image = cv2.resize(opencv_image, application.settings.IMAGE_SIZE)
+        image = cv2.resize(opencv_image, (32, 32))
     except Exception as e:
         return {'error': 'Erreur lors du redimmensionnement du fichier'}
 
@@ -30,14 +30,29 @@ def launch_traitment(image, model_name):
         return {'error': 'Erreur lors du traitement de votre image'}
 
     try:
-        model = load_model(model_name)
+        model, model_name = load_model(model_name)
     except Exception as e:
         return {'error': 'Erreur lors du chargement du model'}
 
-    print(pixel)
-    print(model)
+    res = Utils.predict(model, model_name, pixel)
 
-    return {"res": True, 'pixel': pixel}
+    print('\n\n----------------')
+    print('Predicted image size :', len(pixel), "pixels")
+    print("Result :", res)
+    print('----------------\n\n')
+    # print(pixel)
+    # print(model)
+
+    classe = "?"
+    maxindex = val.index(max(res))
+    if maxindex == 1:
+        classe = "Italie"
+    elif maxindex == 2:
+        classe = "France"
+    elif maxindex == 3:
+        classe = "Italie"
+
+    return {"res": True, 'result': res, 'classe': classe}
 
 
 def load_model(model_name):

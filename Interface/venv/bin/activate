@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/Users/baptiste/Desktop/Cours/ESGI - BACHELOR/AnnualProject3IBD/Interface/venv"
+VIRTUAL_ENV="/Users/baptiste/Desktop/Cours/ESGI/ProjetAnnuel/Interface/venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

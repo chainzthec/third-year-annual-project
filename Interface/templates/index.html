@@ -11,9 +11,9 @@
     <input type="file" id="inputFile" style="position: absolute; top: -500px;">
 
     <select name="modelName" id="modelName" style="position: absolute; top: 0; left: 0; margin: 10px; height: 30px;">
-        <option value="{{ files|first }}">Veuillez séléctionner un modèle à charger</option>
+        <option data-id="0" value="{{ files|first }}">Veuillez séléctionner un modèle à charger</option>
         {% for file in files %}
-            <option value="{{ file }}">{{ file }} {% if forloop.counter == 1 %}- default{% endif %}</option>
+            <option data-id="{{ forloop.counter }}"  value="{{ file }}">{{ file }} {% if forloop.counter == 1 %}- default{% endif %}</option>
         {% endfor %}
     </select>
 

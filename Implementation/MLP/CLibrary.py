@@ -102,8 +102,6 @@ def predict(mlp, xToPredict, isClassif=False):
 
     return result
 
-    # return [predictions[i] for i in range(N[-1])]
-
 
 def export(mlp):
     myDll.getWSize.argtypes = [c_void_p]
