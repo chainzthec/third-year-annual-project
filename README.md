@@ -24,35 +24,39 @@ Lien vers le rapport (Google Doc) : [Rapport Projet Annuel](https://docs.google.
 Il faut tout d'abord se placer dans le répertoire du fichier .cpp que l'on souhaite compiler
 
 ```bash
-cd ProjetAnnuel/Implementation/Rosenblatt/
+cd ProjetAnnuel/Implementation/Linear/
 ```
 
 ```bash
 cd ProjetAnnuel/Implementation/MLP/
 ```
 
+```bash
+cd ProjetAnnuel/Implementation/RBF/
+```
+
 puis pour compiler le fichier .cpp avec ses dépendances :
 
-#### Rosenblatt : 
+#### Modèle Linéaire : 
 
 * Windows : 
 
 ```bash
-g++ -c Rosenblatt.cpp && g++ -shared -o Rosenblatt.dll Rosenblatt.o -W
+g++ -c Linear.cpp && g++ -shared -o Linear.dll Linear.o -W
 ```
 
 * Mac : 
 
 ```bash
-g++ -c -std=c++17 Rosenblatt.cpp -o Librairie/Mac/Rosenblatt_Mac.o && 
-g++ -shared -Wl -o Librairie/Mac/Rosenblatt_Mac.so Librairie/Mac/Rosenblatt_Mac.o
+g++ -c -std=c++17 Linear.cpp -o Librairie/Mac/Linear_Mac.o && 
+g++ -shared -Wl -o Librairie/Mac/Linear_Mac.so Librairie/Mac/Linear_Mac.o
 ```
 
 * Linux : 
 
 ```bash
-g++ -c -std=c++17 Rosenblatt.cpp -o Librairie/Linux/Rosenblatt_Linux.o && 
-g++ -shared -Wl -o Librairie/Linux/Rosenblatt_Linux.so Librairie/Linux/Rosenblatt_Linux.o
+g++ -c -std=c++17 Linear.cpp -o Librairie/Linux/Linear_Linux.o && 
+g++ -shared -Wl -o Librairie/Linux/Linear_Linux.so Librairie/Linux/Linear_Linux.o
 ```
 
 #### MLP : 
@@ -60,29 +64,51 @@ g++ -shared -Wl -o Librairie/Linux/Rosenblatt_Linux.so Librairie/Linux/Rosenblat
 * Windows : 
 
 ```bash
-g++ -c MultiLayerPerceptron.cpp && g++ -shared -o Librairie/Windows/MultiLayerPerceptron_Windows.dll Librairie/Windows/MultiLayerPerceptron_Windows.o -W
+g++ -c MLP.cpp && g++ -shared -o Librairie/Windows/MLP_Windows.dll Librairie/Windows/MLP_Windows.o -W
 ```
 
 * Mac :  
 
 ```bash
-g++ -c -std=c++17 MultiLayerPerceptron.cpp -o Librairie/Mac/MultiLayerPerceptron_Mac.o && 
-g++ -shared -Wl -o Librairie/Mac/MultiLayerPerceptron_Mac.so Librairie/Mac/MultiLayerPerceptron_Mac.o
+g++ -c -std=c++17 MLP.cpp -o Librairie/Mac/MLP_Mac.o && 
+g++ -shared -Wl -o Librairie/Mac/MLP_Mac.so Librairie/Mac/MLP_Mac.o
 ```
 
 * Linux :  
 
 ```bash
-g++ -c -std=c++17 MultiLayerPerceptron.cpp -o Librairie/Linux/MultiLayerPerceptron_Linux.o && 
-g++ -shared -Wl -o Librairie/Linux/MultiLayerPerceptron_Linux.so Librairie/Linux/MultiLayerPerceptron_Linux.o
+g++ -c -std=c++17 MLP.cpp -o Librairie/Linux/MLP_Linux.o && 
+g++ -shared -Wl -o Librairie/Linux/MLP_Linux.so Librairie/Linux/MLP_Linux.o
+```
+
+#### RBF : 
+
+* Windows : 
+
+```bash
+g++ -c RBF.cpp && g++ -shared -o Librairie/Windows/RBF_Windows.dll Librairie/Windows/RBF_Windows.o -W
+```
+
+* Mac :  
+
+```bash
+g++ -c -std=c++17 RBF.cpp -o Librairie/Mac/RBF_Mac.o && 
+g++ -shared -Wl -o Librairie/Mac/RBF_Mac.so Librairie/Mac/RBF_Mac.o
+```
+
+* Linux :  
+
+```bash
+g++ -c -std=c++17 RBF.cpp -o Librairie/Linux/RBF_Linux.o && 
+g++ -shared -Wl -o Librairie/Linux/RBF_Linux.so Librairie/Linux/RBF_Linux.o
 ```
 
 #### Librairie C + Python 
 
 Il faut modifier la ligne d'importation de la librairie en fonction de votre OS dans les fichiers suivant : 
 ```cpp 
-Implentation/Rosenblatt/CLibrary.cpp
-Implentation/MLP/CLibrary.cpp
+Implentation/Linear/Linear.cpp
+Implentation/MLP/MLP.cpp
 ```
 
 <br>

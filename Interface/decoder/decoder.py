@@ -7,8 +7,8 @@ import cv2
 
 sys.path.append(os.path.abspath(os.path.join(__file__, "../../..")))
 import Utils
-import Implementation.MLP.CLibrary as MLP
-import Implementation.Rosenblatt.CLibrary as ROSENBLATT
+import Implementation.MLP.MLP as MLP
+import Implementation.Linear.Linear as Linear
 
 
 def launch_traitment(image, model_name):

@@ -11,8 +11,7 @@ import numpy as np
 import os
 import time
 
-# import MLP.CLibrary as MLP
-import Implementation.MLP.CLibrary as MLP
+import Implementation.MLP.MLP as MLP
 import Utils
 
 
@@ -26,7 +25,7 @@ def image_to_array(image):
     return list_pixel
 
 
-def start(path, imgSize=(16, 16)):
+def start(path, imgSize):
     validExt = {'jpg', 'png', 'jpeg'}
     XTrain = []
     YTrain = []
@@ -77,7 +76,14 @@ def start(path, imgSize=(16, 16)):
 if __name__ == "__main__":
     inputVal = input("Dataset à entrainer : ")
     filepath = inputVal.rstrip(' ') + '/'.replace("\\ ", ' ')
-    xT, yT, sampleCount, inputCountPerSample = start(filepath, (32, 32))
+
+    _size = (64, 64)
+    n1 = _size[0] * _size[1] * 3
+    N = [n1, 64, 64, 2]
+    epochs = 100
+    alpha = 0.1
+
+    xT, yT, sampleCount, inputCountPerSample = start(filepath, _size)
 
     print("")
     # print(xT)
@@ -86,18 +92,6 @@ if __name__ == "__main__":
     print("- Nombre d'images : " + str(sampleCount))
 
     print("")
-
-    # N = [3072, 64, 64, 2]
-    # epochs = 100
-    # alpha = 0.001
-
-    # N = [3072, 64, 64, 2]
-    # epochs = 1000
-    # alpha = 0.001
-    #
-    N = [3072, 128, 32, 2]
-    epochs = 100
-    alpha = 0.01
 
     start_time = time.time()
 
@@ -112,4 +106,5 @@ if __name__ == "__main__":
 
     # Utils.save(mlpClassif, 'MLP', 'classification_E100_A0001_N3072_64_64_2')
     # Utils.save(mlpClassif, 'MLP', 'classification_E1000_A0001_N3072_64_64_2.model')
-    Utils.save(mlpClassif, 'MLP', 'classification_E500_A001_N3072_128_16_2')
+    # Utils.save(mlpClassif, 'MLP', 'classification_E500_A001_N3072_128_16_2')
+    Utils.save(mlpClassif, 'MLP', 'classification_E1000_A001_N3072_64_64_2.model')

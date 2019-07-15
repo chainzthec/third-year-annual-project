@@ -102,7 +102,7 @@ function uploadFormData(image) {
 		success: function(response){
 
 			if(response.classe){
-				addNotification('success', 'Voilà !', "Réponse du serveur : " + response.classe, false);
+				addNotification('success', 'Voilà !', "Drapeau : " + response.classe, false);
 			}else{
 				addNotification('success', 'Voilà !', "Erreur ! : " + response, false);
 			}
