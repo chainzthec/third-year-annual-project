@@ -25,13 +25,13 @@ def image_to_array(image):
     return list_pixel
 
 
-def start(path, imgSize):
+def start(path, _size):
     validExt = {'jpg', 'png', 'jpeg'}
     XTrain = []
     YTrain = []
     classe = 0
     imgNb = 0
-    nbPixPerLine = imgSize[0] * imgSize[1] * 3
+    nbPixPerLine = _size[0] * _size[1] * 3
 
     for root, dirList, files in os.walk(path):
 
@@ -57,7 +57,7 @@ def start(path, imgSize):
                         try:
                             # print("Image : " + filename + " du répertoire : " + singleDir + " : chargé")
                             image = cv2.imread(filename)
-                            image = cv2.resize(image, imgSize)
+                            image = cv2.resize(image, _size)
                             pixel = image_to_array(image)
                             XTrain += pixel
                             YTrain += list_possibily
@@ -77,18 +77,23 @@ if __name__ == "__main__":
     inputVal = input("Dataset à entrainer : ")
     filepath = inputVal.rstrip(' ') + '/'.replace("\\ ", ' ')
 
-    _size = (64, 64)
-    n1 = _size[0] * _size[1] * 3
-    N = [n1, 64, 64, 2]
-    epochs = 100
-    alpha = 0.1
+    largeur = input("Largeur de l'image ? (par défaut 32) ")
+    largeur = 32 if len(largeur) == 0 else int(largeur)
+    size = (largeur, largeur)
 
-    xT, yT, sampleCount, inputCountPerSample = start(filepath, _size)
+    epochs = input("Epochs ? (par défaut 1000) ")
+    epochs = 1000 if len(epochs) == 0 else int(epochs)
+
+    alpha = input("Alpha ? (par défaut 0.01) ")
+    alpha = 0.01 if len(alpha) == 0 else float(alpha)
+
+    xT, yT, sampleCount, inputCountPerSample = start(filepath, size)
+    N = [inputCountPerSample, 64, 64, 2]
 
     print("")
-    # print(xT)
-    # print(yT)
-    print("- Taille d'une image : " + str(inputCountPerSample))
+    print("- Epochs : " + str(epochs))
+    print("- Alpha : " + str(alpha))
+    print("- Taille d'une image : ", str(_s) + "x" + str(_s), 'x3 -> ', str(inputCountPerSample))
     print("- Nombre d'images : " + str(sampleCount))
 
     print("")

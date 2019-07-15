@@ -89,10 +89,15 @@ if __name__ == "__main__":
 
     start_time = time.time()
 
-    # model, algo_name = Utils.load('MLP_classification_E1000_A0001_N3072_64_64_2.model')
-    model, algo_name = Utils.load('MLP_classification_E500_A001_N3072_128_16_2.model')
+    # MLP_classification_E500_A001_N3072_128_16_2.model
+    _model_name = input('Modèle à charger ? :')
+    model, algo_name = Utils.load(_model_name)
 
-    sampleCount, inputCountPerSample, valid, invalid = start(filepath, (32, 32), model, algo_name)
+    largeur = input("Largeur de l'image ? (par défaut 32) ")
+    largeur = 32 if len(largeur) == 0 else int(largeur)
+    size = (largeur, largeur)
+
+    sampleCount, inputCountPerSample, valid, invalid = start(filepath, size, model, algo_name)
 
     print()
     print()
