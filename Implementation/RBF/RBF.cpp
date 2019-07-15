@@ -181,7 +181,7 @@ SUPEREXPORT double rbf_predict(RBF *rbf, double *sample) {
     return (gaussianOutputs * rbf->W).sum();
 }
 
-SUPEREXPORT double getWSize(RBF *rbf) {
+SUPEREXPORT int getWSize(RBF *rbf) {
     int res = 0;
     for (int l = 0; l < rbf->W.rows(); l++) {
         res++;
@@ -196,6 +196,10 @@ SUPEREXPORT double *getAllWValues(RBF *rbf) {
         res[i] = rbf->W(i, 0);
     }
     return res;
+}
+
+SUPEREXPORT double getGamma(RBF *rbf){
+    return rbf->gamma;
 }
 
 SUPEREXPORT RBF *create(double* WValues, int length){

@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+import numpy as np
 
 import MLP.CLibrary as MLP
 import Rosenblatt.CLibrary as ROSENBLATT
@@ -49,20 +50,17 @@ def save(model, typeAlgo, _fileName):
 
 
 if __name__ == "__main__":
-    X = [
-        0, 0,
-        1, 0,
-        0, 1,
-        1, 1,
-    ]
-    Y = [1, -1, -1, 1]
+    X = list(np.random.rand(4, 2).flatten())
+    Y = list(np.random.rand(4, 1).flatten())
 
     inputCountPerSample = 4
     sampleCount = 2
     gamma = 100
     rbfModel = RBF.naive_rbf_train(X, Y, inputCountPerSample, sampleCount, gamma)
-    print(rbfW)
-    #save(rbfModel, 'RBF', 'train_1000_001')
+    rbfG = RBF.export(rbfModel)
+    print(rbfG)
+
+    # save(rbfModel, 'RBF', 'train_1000_001')
 
     # N = [2, 2, 1]
     # sampleCount = 4

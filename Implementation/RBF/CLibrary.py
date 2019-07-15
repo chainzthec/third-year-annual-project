@@ -24,7 +24,8 @@ if get_platform() == "OSX":
     myDll = cdll.LoadLibrary(os.path.join(dirname, 'Librairie/Mac/RBF_Mac.so'))  # For Mac
 
 elif get_platform() == "Linux":
-    myDll = cdll.LoadLibrary(os.path.join('/home/eight/Repositories/projet-annuel/Implementation/RBF/Librairie/Linux/RBF_Linux.so'))  # For Linux
+    myDll = cdll.LoadLibrary(os.path.join(
+        '/home/eight/Repositories/projet-annuel/Implementation/RBF/Librairie/Linux/RBF_Linux.so'))  # For Linux
 
 elif get_platform() == "Windows":
     myDll = cdll.LoadLibrary(os.path.join(dirname, 'Librairie/Windows/RBF_Linux.dll'))  # For Windows
@@ -101,10 +102,15 @@ def naive_rbf_classification_predict(model, sample):
     predict_value = myDll.naive_rbf_classification_predict(model, c_sample_double)
     return predict_value
 
+
 def export(rbf):
     myDll.getWSize.argtypes = [c_void_p]
     myDll.getWSize.restype = c_int
     WSize = myDll.getWSize(rbf)
+
+    myDll.getGamma.argtypes = [c_void_p]
+    myDll.getGamma.restype = c_double
+    Gamma = myDll.getGamma(rbf)
 
     myDll.getAllWValues.argtypes = [c_void_p]
     myDll.getAllWValues.restype = POINTER(c_double)
@@ -115,7 +121,7 @@ def export(rbf):
     for i in range(WSize):
         WValuesArray.append(WValues[i])
 
-    return {"W": WValuesArray, 'type': 'rbf'}
+    return {"W": WValuesArray, 'gamma': Gamma, 'type': 'rbf'}
 
 
 def create(content):
@@ -130,4 +136,4 @@ def create(content):
     ]
 
     myDll.create.restype = c_void_p
-    return myDll.create(WPointer,WSize)
+    return myDll.create(WPointer, WSize)
