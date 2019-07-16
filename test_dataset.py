@@ -60,17 +60,34 @@ def start(_path, _size, _model, _algo_name):
                             xToPredict = image_to_array(image)
 
                             res = Utils.predict(_model, _algo_name, xToPredict)
-                            indexRes = res.index(max(res))
 
-                            YTrainIndex = YTrain.index(max(YTrain))
-                            if indexRes == YTrainIndex:
-                                print('#' + str(i), '> filename', filename, '> indexRes', indexRes, '-',
-                                      'YTrainIndex', YTrainIndex, '-> GOOD')
-                                valid += 1
-                            else:
-                                print('#' + str(i), '> filename', filename, '> indexRes', indexRes, '-',
-                                      'YTrainIndex', YTrainIndex, '-> BAD')
-                                invalid += 1
+                            if _algo_name.upper() == "MLP":
+                                indexRes = res.index(max(res))
+
+                                YTrainIndex = YTrain.index(max(YTrain))
+                                if indexRes == YTrainIndex:
+                                    print('#' + str(i), '> filename', filename, 'res:', str(res), '> indexRes', indexRes, '-',
+                                          'YTrainIndex', YTrainIndex, '-> GOOD')
+                                    valid += 1
+                                else:
+                                    print('#' + str(i), '> filename', filename, 'res:', str(res), '> indexRes', indexRes, '-',
+                                          'YTrainIndex', YTrainIndex, '-> BAD')
+                                    invalid += 1
+
+                            elif _algo_name.upper() == "LINEAR":
+
+                                val = YTrain[0]
+
+                                if val == res:
+                                    print('#' + str(i), '> filename', filename, '> val', val, '-',
+                                          'res', res, '-> GOOD')
+                                    valid += 1
+                                else:
+                                    print('#' + str(i), '> filename', filename, '> val', val, '-',
+                                          'res', res, '-> BAD')
+                                    invalid += 1
+
+                                print(res)
 
                             imgNb += 1
 

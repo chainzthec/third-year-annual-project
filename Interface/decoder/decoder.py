@@ -29,12 +29,12 @@ def launch_traitment(image, model_name):
     except Exception as e:
         return {'error': 'Erreur lors du traitement de votre image'}
 
-    try:
-        model, model_name = load_model(model_name)
-    except Exception as e:
-        return {'error': 'Erreur lors du chargement du model'}
+    # try:
+    model, algo_name = load_model(model_name)
+    # except Exception as e:
+    #     return {'error': 'Erreur lors du chargement du model'}
 
-    res = Utils.predict(model, model_name, pixel)
+    res = Utils.predict(model, algo_name, pixel)
 
     print('\n\n----------------')
     print('Predicted image size :', len(pixel), "pixels")
@@ -43,9 +43,9 @@ def launch_traitment(image, model_name):
     # print(pixel)
     # print(model)
 
+    classe = "?"
     if algo_name.upper() == "MLP":
 
-        classe = "?"
         maxindex = res.index(max(res))
         if maxindex == 0:
             classe = "France"
@@ -55,7 +55,10 @@ def launch_traitment(image, model_name):
             classe = "Congo"
 
     elif algo_name.upper() == "LINEAR":
-        classe = "ok"
+        if res < 0:
+            classe = "France"
+        else:
+            classe = "Italie"
 
     return {"res": True, 'result': res, 'classe': classe}
 

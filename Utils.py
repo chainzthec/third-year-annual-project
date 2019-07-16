@@ -11,16 +11,14 @@ def load(_filename):
     dirname = os.path.dirname(__file__)
     _filename = os.path.join(dirname, "Models/" + _filename)
 
-    print(_filename)
-
     with open(_filename, mode='r+') as f:
         content = json.load(f)
 
     value = "Erreur lors du chargement !"
-    algo_name = content['type']
-    if algo_name.upper() == "MLP":
+    algo_name = content['type'].upper()
+    if algo_name == "MLP":
         value = MLP.create(content)
-    elif algo_name.upper() == "LINEAR":
+    elif algo_name == "LINEAR":
         value = Linear.create(content)
 
     return value, algo_name

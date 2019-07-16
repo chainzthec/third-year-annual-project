@@ -26,7 +26,7 @@ def image_to_array(image):
     return list_pixel
 
 
-def start(path, _size):
+def start(path, _size, algo_name):
     validExt = {'jpg', 'png', 'jpeg'}
     XTrain = []
     YTrain = []
@@ -96,7 +96,7 @@ if __name__ == "__main__":
         if algo_name == "LINEAR" or algo_name == "MLP" or algo_name == "RBF":
             repeat = False
 
-    xT, yT, sampleCount, inputCountPerSample = start(filepath, size)
+    xT, yT, sampleCount, inputCountPerSample = start(filepath, size, algo_name)
 
     print("")
     print("- Epochs : " + str(epochs))
@@ -113,13 +113,13 @@ if __name__ == "__main__":
         N = [inputCountPerSample, 64, 64, 2]
         mlpClassif = MLP.init(N)
         mlpClassif = MLP.fit_classification(mlpClassif, xT, yT, sampleCount, epochs, alpha)
-        Utils.save(mlpClassif, 'MLP', 'classification_E'+str(epochs)+'_A'+str(alpha)+'_N'+str(N)+'.model')
+        Utils.save(mlpClassif, 'MLP', 'classification_E'+str(epochs)+'_A'+str(alpha)+'_N'+str(N))
 
     elif algo_name == "LINEAR":
 
         linearClassif = LINEAR.create_linear_model(inputCountPerSample)
-        LINEAR.fit_classification(linearClassif, xT, yT, alpha, epochs, inputCountPerSample)
-        Utils.save(linearClassif, 'LINEAR', 'classification_E'+str(epochs)+'_A'+str(alpha)+'.model')
+        linearClassif = LINEAR.fit_classification(linearClassif, xT, yT, alpha, epochs, inputCountPerSample)
+        Utils.save(linearClassif, 'LINEAR', 'classification_E'+str(epochs)+'_A'+str(alpha))
 
     end_time = time.time()
 
