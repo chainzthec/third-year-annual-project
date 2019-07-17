@@ -107,6 +107,9 @@ def result_traitment(_counter, _algo_name, _filename, _res, _YTrain):
                   'res', res, '-> BAD')
             return False
 
+    elif _algo_name.upper() == "RBF":
+        # Todo : Ajout implém RBF
+        pass
 
 if __name__ == "__main__":
     inputVal = input("Dataset à tester : ")

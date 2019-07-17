@@ -16,10 +16,16 @@ def load(_filename):
 
     value = "Erreur lors du chargement !"
     algo_name = content['type'].upper()
+    
     if algo_name == "MLP":
         value = MLP.create(content)
+
     elif algo_name == "LINEAR":
         value = Linear.create(content)
+
+    elif algo_name == "RBF":
+        # Todo : Ajout implém RBF
+        pass
 
     return value, algo_name
 
@@ -27,8 +33,13 @@ def load(_filename):
 def predict(model, algo_name, XToPredict):
     if algo_name.upper() == "MLP":
         return MLP.predict(model, XToPredict, True)
+
     elif algo_name.upper() == "LINEAR":
         return Linear.predict_classification(model, XToPredict)
+
+    elif algo_name.upper() == "RBF":
+        # Todo : Ajout implém RBF
+        pass
 
 
 def save(model, algo_name, _filename):
@@ -36,10 +47,14 @@ def save(model, algo_name, _filename):
     value = {}
     if algo_name.upper() == "MLP":
         value = MLP.export(model)
+
     elif algo_name.upper() == "LINEAR":
         value = Linear.export(model)
-    # elif algo_name.upper() == "RBF":
+
+    elif algo_name.upper() == "RBF":
+        # Todo : Ajout implém RBF
         # value = RBF.export(model)
+        pass
 
     json_val = json.dumps(value)
 

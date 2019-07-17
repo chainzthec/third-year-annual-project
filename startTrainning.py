@@ -44,25 +44,32 @@ def start(path, _size):
 
         if 0 < len(dirList):
 
+            print()
+
             for singleDir in dirList:
 
                 list_possibily = [-1] * len(dirList)
                 list_possibily[classe] = 1
 
-                print("Classe :", singleDir, '->', list_possibily)
+                print("> Chargement du dossier " + str(singleDir))
 
                 fullpath = os.path.join(root, singleDir)
                 filelist = os.listdir(fullpath)
 
-                for filename in filelist:
+                counter = 0
+                for i, filename in enumerate(filelist):
                     if filename.split(".")[-1].lower() in valid_extension:
                         filename = os.path.join(fullpath, filename)
 
                         _XTrain.append(filename)
                         _YTrain.append(list_possibily)
                         _sampleCount += 1
+                        counter += 1
 
-                print("     > Dossier " + str(singleDir) + " chargé !")
+                print("> Images dans le dossier : " + str(counter))
+                print("> Dossier " + str(singleDir) + " chargé !", '->', list_possibily)
+
+                print()
                 classe += 1
 
     c = list(zip(_XTrain, _YTrain))
@@ -72,22 +79,44 @@ def start(path, _size):
     return _XTrain, _YTrain, _sampleCount, _inputCountPerSample
 
 
-def launchTraitement(_XTrain, _YTrain, _size):
+def launchTraitement(_XTrain, _YTrain, _algo_name, _size):
 
     _xTrainFinal = []
     _yTrainFinal = []
 
+    print("> Convertion des images en pixel")
+    _XTrain_size = len(_XTrain)
+    _XTrain_size_percent = int(_XTrain_size / 10)
+
     for i, filename in enumerate(_XTrain):
         try:
-            # print("Image : " + filename + " du répertoire : " + singleDir + " : chargé")
             image = cv2.imread(filename)
             image = cv2.resize(image, _size)
             pixel = image_to_array(image)
             _xTrainFinal += pixel
-            _yTrainFinal += _YTrain[i]
 
-        except Exception:
-            # print("L'image : " + filename + " du répertoire : " + singleDir + " est inutilisable.")
+            if algo_name == "MLP":
+                _yTrainFinal += _YTrain[i]
+
+            elif algo_name == "LINEAR":
+
+                _attemp = False
+                if _YTrain[i] == [1, -1]:
+                    _attemp = 1
+                elif _YTrain[i] == [-1, 1]:
+                    _attemp = -1
+
+                _yTrainFinal.append(_attemp)
+
+            elif algo_name == "RBF":
+                # Todo : Ajout implém RBF
+                pass
+
+            if i % _XTrain_size_percent == 0:
+                print("- Conversion : " + str(i) + '/' + str(_XTrain_size) + " images")
+
+        except Exception as e:
+            print("L'image : " + filename + " est inutilisable." + str(e))
             continue
 
     return _xTrainFinal, _yTrainFinal
@@ -126,12 +155,14 @@ if __name__ == "__main__":
 
     files, possibleResults, sampleCount, inputCountPerSample = start(filepath, size)
 
-    xTrain, yTrain = launchTraitement(files, possibleResults, size)
+    xTrain, yTrain = launchTraitement(files, possibleResults, algo_name, size)
+
+    # print(yTrain)
 
     print("")
     print("- Epochs : " + str(epochs))
     print("- Alpha : " + str(alpha))
-    print("- Taille d'une image : ", str(size[0]) + "x" + str(size[1]), 'x3 -> ', str(inputCountPerSample))
+    print("- Taille d'une image : " + str(size[0]) + "x" + str(size[1]) + 'x3 -> ' + str(inputCountPerSample))
     print("- Nombre d'images : " + str(sampleCount))
 
     print("")
