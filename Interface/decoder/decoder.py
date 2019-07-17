@@ -21,7 +21,6 @@ def launch_traitment(image, model_name):
 
     try:
         image = cv2.resize(opencv_image, (32, 32))
-<<<<<<< HEAD
     except Exception as e:
         return {'error': 'Erreur lors du redimmensionnement du fichier'}
 
@@ -36,39 +35,15 @@ def launch_traitment(image, model_name):
     #     return {'error': 'Erreur lors du chargement du model'}
 
     res = Utils.predict(model, algo_name, pixel)
-=======
-    except Exception as e:
-        return {'error': 'Erreur lors du redimmensionnement du fichier'}
-
-    try:
-        pixel = image_to_array(image)
-    except Exception as e:
-        return {'error': 'Erreur lors du traitement de votre image'}
-
-    try:
-        model, model_name = load_model(model_name)
-    except Exception as e:
-        return {'error': 'Erreur lors du chargement du model'}
-
-    res = Utils.predict(model, model_name, pixel)
->>>>>>> 7044ecb369e2c2312ec8a9d4f4c0146bdbeeae00
 
     print('\n\n----------------')
     print('Predicted image size :', len(pixel), "pixels")
     print("Result :", res)
     print('----------------\n\n')
-    # print(pixel)
-    # print(model)
 
-<<<<<<< HEAD
     classe = "?"
     if algo_name.upper() == "MLP":
 
-=======
-    if algo_name.upper() == "MLP":
-
-        classe = "?"
->>>>>>> 7044ecb369e2c2312ec8a9d4f4c0146bdbeeae00
         maxindex = res.index(max(res))
         if maxindex == 0:
             classe = "France"
@@ -78,14 +53,10 @@ def launch_traitment(image, model_name):
             classe = "Congo"
 
     elif algo_name.upper() == "LINEAR":
-<<<<<<< HEAD
         if res < 0:
             classe = "France"
         else:
             classe = "Italie"
-=======
-        classe = "ok"
->>>>>>> 7044ecb369e2c2312ec8a9d4f4c0146bdbeeae00
 
     return {"res": True, 'result': res, 'classe': classe}
 

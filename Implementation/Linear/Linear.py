@@ -70,11 +70,7 @@ def fit_classification(W, XTrain, YTrain, alpha, epochs, inputCountPerSample=Fal
         values.append(result[i])
 
     return {"model": values, "inputCountPerSample": inputCountPerSample, "sampleCount": sampleCount,
-<<<<<<< HEAD
             'type': 'linear', 'liner_type': 'classification', "alpha": alpha, 'epochs': epochs}
-=======
-            'type': 'rosenblatt', 'liner_type': 'classification', "alpha": alpha, 'epochs': epochs}
->>>>>>> 7044ecb369e2c2312ec8a9d4f4c0146bdbeeae00
 
 
 def fit_regression(W, XTrain, YTrain, inputCountPerSample=False):
@@ -103,11 +99,7 @@ def fit_regression(W, XTrain, YTrain, inputCountPerSample=False):
         values.append(result[i])
 
     return {"model": values, "inputCountPerSample": inputCountPerSample, "sampleCount": sampleCount,
-<<<<<<< HEAD
             'type': 'linear', 'liner_type': 'regression'}
-=======
-            'type': 'rosenblatt', 'liner_type': 'regression'}
->>>>>>> 7044ecb369e2c2312ec8a9d4f4c0146bdbeeae00
 
 
 def predict_classification(model, value):
