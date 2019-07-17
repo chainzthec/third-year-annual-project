@@ -28,10 +28,10 @@ def image_to_array(image):
 def start(_path, _size, _model, _algo_name):
     validExt = {'jpg', 'png', 'jpeg'}
     classe = 0
-    imgNb = 0
+    _sampleCount = 0
     valid = 0
     invalid = 0
-    nbPixPerLine = _size[0] * _size[1] * 3
+    _inputCountPerSample = _size[0] * _size[1] * 3
 
     for root, dirList, files in os.walk(_path):
 
@@ -51,7 +51,8 @@ def start(_path, _size, _model, _algo_name):
                 fullpath = os.path.join(root, singleDir)
                 filelist = os.listdir(fullpath)
 
-                for i, filename in enumerate(filelist):
+
+                for filename in filelist:
                     if filename.split(".")[-1].lower() in validExt:
                         filename = os.path.join(fullpath, filename)
                         try:
@@ -61,35 +62,12 @@ def start(_path, _size, _model, _algo_name):
 
                             res = Utils.predict(_model, _algo_name, xToPredict)
 
-                            if _algo_name.upper() == "MLP":
-                                indexRes = res.index(max(res))
+                            if result_traitment(_sampleCount, _algo_name, filename, res, YTrain):
+                                valid += 1
+                            else:
+                                invalid += 1
 
-                                YTrainIndex = YTrain.index(max(YTrain))
-                                if indexRes == YTrainIndex:
-                                    print('#' + str(i), '> filename', filename, 'res:', str(res), '> indexRes', indexRes, '-',
-                                          'YTrainIndex', YTrainIndex, '-> GOOD')
-                                    valid += 1
-                                else:
-                                    print('#' + str(i), '> filename', filename, 'res:', str(res), '> indexRes', indexRes, '-',
-                                          'YTrainIndex', YTrainIndex, '-> BAD')
-                                    invalid += 1
-
-                            elif _algo_name.upper() == "LINEAR":
-
-                                val = YTrain[0]
-
-                                if val == res:
-                                    print('#' + str(i), '> filename', filename, '> val', val, '-',
-                                          'res', res, '-> GOOD')
-                                    valid += 1
-                                else:
-                                    print('#' + str(i), '> filename', filename, '> val', val, '-',
-                                          'res', res, '-> BAD')
-                                    invalid += 1
-
-                                print(res)
-
-                            imgNb += 1
+                            _sampleCount += 1
 
                         except Exception:
                             continue
@@ -97,32 +75,62 @@ def start(_path, _size, _model, _algo_name):
                 print("     > Dossier " + str(singleDir) + " chargé !")
                 classe += 1
 
-    return imgNb, nbPixPerLine, valid, invalid
+    return _sampleCount, _inputCountPerSample, valid, invalid
+
+
+def result_traitment(_counter, _algo_name, _filename, _res, _YTrain):
+    if _algo_name.upper() == "MLP":
+
+        indexRes = _res.index(max(_res))
+        YTrainIndex = _YTrain.index(max(_YTrain))
+
+        if indexRes == YTrainIndex:
+            print('#' + str(_counter), '> filename', _filename, '_res:', str(_res), '> indexRes', indexRes, '-',
+                  'YTrainIndex', YTrainIndex, '-> GOOD')
+            return True
+
+        else:
+            print('#' + str(_counter), '> filename', _filename, '_res:', str(_res), '> indexRes', indexRes, '-',
+                  'YTrainIndex', YTrainIndex, '-> BAD')
+            return False
+
+    elif _algo_name.upper() == "LINEAR":
+
+        val = YTrain[0]
+
+        if val == res:
+            print('#' + str(_counter), '> filename', _filename, '> val', val, '-',
+                  'res', res, '-> GOOD')
+            return True
+
+        else:
+            print('#' + str(_counter), '> filename', _filename, '> val', val, '-',
+                  'res', res, '-> BAD')
+            return False
 
 
 if __name__ == "__main__":
     inputVal = input("Dataset à tester : ")
     filepath = inputVal.rstrip(' ') + '/'.replace("\\ ", ' ')
 
-    start_time = time.time()
-
-    # MLP_classification_E500_A001_N3072_128_16_2.model
-    _model_name = input('Modèle à charger ? : ')
+    _model_name = input('Modèle à charger (nom.model) ? : ')
     model, algo_name = Utils.load(_model_name)
 
     largeur = input("Largeur de l'image ? (par défaut 32) ")
     largeur = 32 if len(largeur) == 0 else int(largeur)
     size = (largeur, largeur)
 
-    sampleCount, inputCountPerSample, valid, invalid = start(filepath, size, model, algo_name)
+    start_time = time.time()
+
+    sampleCount, inputCountPerSample, nb_valid, nb_invalid = start(filepath, size, model, algo_name)
 
     print()
     print()
     print("- Taille d'une image : " + str(inputCountPerSample))
     print("- Nombre d'images : " + str(sampleCount))
 
-    print("- Prédiction correct : " + str(valid) + "/" + str(sampleCount) + " soit " + str((100 * valid / sampleCount)) + "%")
-    print("- Prédiction incorrect : " + str(invalid) + "/" + str(sampleCount) + " soit " + str((100 * invalid / sampleCount)) + "%")
+    print("- Prédiction correct : " + str(nb_valid) + "/" + str(sampleCount) + " soit " + str((100 * nb_valid / sampleCount)) + "%")
+    print("- Prédiction incorrect : " + str(nb_invalid) + "/" + str(sampleCount) + " soit " + str((100 * nb_invalid / sampleCount)) + "%")
 
     end_time = time.time()
 
