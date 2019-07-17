@@ -1,6 +1,5 @@
-#!/bin/sh
-'''exec' "/Users/baptiste/Desktop/Cours/ESGI - BACHELOR/AnnualProject3IBD/Interface/venv/bin/python" "$0" "$@"
-' '''
+#!/Users/baptiste/Desktop/Cours/ESGI/ProjetAnnuel/Interface/venv/bin/python
+
 # -*- coding: utf-8 -*-
 import re
 import sys
