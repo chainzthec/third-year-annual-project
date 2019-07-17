@@ -104,7 +104,11 @@ function uploadFormData(image) {
 			if(response.classe){
 				addNotification('success', 'Voilà !', "Drapeau : " + response.classe, false);
 			}else{
+<<<<<<< HEAD
 				addNotification('success', 'Voilà !', "Erreur ! : " + response.error, false);
+=======
+				addNotification('success', 'Voilà !', "Erreur ! : " + response, false);
+>>>>>>> 7044ecb369e2c2312ec8a9d4f4c0146bdbeeae00
 			}
 			// addNotification('success', 'Voilà !', response.message);
 
