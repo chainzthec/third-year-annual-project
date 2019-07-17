@@ -57,25 +57,7 @@ $('input[type="file"]').change(function(){
 
 });
 
-function getUrlVars() {
-    let vars = {};
-    let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-        vars[key] = value;
-    });
-    return vars;
-}
 
-function getUrlParam(parameter, defaultvalue){
-    let urlparameter = defaultvalue;
-    if(window.location.href.indexOf(parameter) > -1){
-        urlparameter = getUrlVars()[parameter];
-        }
-    return urlparameter;
-}
-
-value = getUrlParam('model', 0);
-console.log(value);
-$("#modelName option[data-id='"+value+"']").attr('selected', 'selected');
 
 function uploadFormData(image) {
 
@@ -101,15 +83,7 @@ function uploadFormData(image) {
 		processData: false,
 		success: function(response){
 
-			if(response.classe){
-				addNotification('success', 'Voilà !', "Drapeau : " + response.classe, false);
-			}else{
-<<<<<<< HEAD
-				addNotification('success', 'Voilà !', "Erreur ! : " + response.error, false);
-=======
-				addNotification('success', 'Voilà !', "Erreur ! : " + response, false);
->>>>>>> 7044ecb369e2c2312ec8a9d4f4c0146bdbeeae00
-			}
+			addNotification('success', 'Voilà !', "Réponse du serveur", false);
 			// addNotification('success', 'Voilà !', response.message);
 
 			console.log(response);
@@ -126,7 +100,7 @@ function uploadFormData(image) {
 			if (response.error) {
                 addNotification('error', 'Ohh !', response.error);
             } else {
-                addNotification('error', 'Erreur !!', "Une erreur serveur est survenue !");
+                addNotification('error', 'Erreur !!', "Oooups something went wrong :/");
             }
 		}
 	});
