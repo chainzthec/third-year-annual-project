@@ -54,22 +54,22 @@ def start(_path, _size, _model, _algo_name):
                 for filename in filelist:
                     if filename.split(".")[-1].lower() in validExt:
                         filename = os.path.join(fullpath, filename)
-                        try:
-                            image = cv2.imread(filename)
-                            image = cv2.resize(image, _size)
-                            xToPredict = image_to_array(image)
+                        # try:
+                        image = cv2.imread(filename)
+                        image = cv2.resize(image, _size)
+                        xToPredict = image_to_array(image)
 
-                            res = Utils.predict(_model, _algo_name, xToPredict)
+                        res = Utils.predict(_model, _algo_name, xToPredict)
 
-                            if result_traitment(_sampleCount, _algo_name, filename, res, YTrain):
-                                valid += 1
-                            else:
-                                invalid += 1
+                        if result_traitment(_sampleCount, _algo_name, filename, res, YTrain):
+                            valid += 1
+                        else:
+                            invalid += 1
 
-                            _sampleCount += 1
+                        _sampleCount += 1
 
-                        except Exception:
-                            continue
+                        # except Exception:
+                        #     continue
 
                 print("     > Dossier " + str(singleDir) + " chargé !")
                 classe += 1
@@ -95,21 +95,35 @@ def result_traitment(_counter, _algo_name, _filename, _res, _YTrain):
 
     elif _algo_name.upper() == "LINEAR":
 
-        val = YTrain[0]
+        _attemp = ""
+        if _YTrain == [1, -1]:
+            _attemp = "superior"
+        elif _YTrain == [-1, 1]:
+            _attemp = "inferior"
 
-        if val == res:
-            print('#' + str(_counter), '> filename', _filename, '> val', val, '-',
-                  'res', res, '-> GOOD')
+        isOk = False
+        if _attemp == "superior":
+            if _res > 0:
+                isOk = True
+
+        elif _attemp == "inferior":
+            if _res < 0:
+                isOk = True
+
+        if isOk:
+            print('#' + str(_counter), '> filename', _filename, '> attemp', _attemp, '-',
+                  'res', _res, '-> GOOD')
             return True
 
         else:
-            print('#' + str(_counter), '> filename', _filename, '> val', val, '-',
-                  'res', res, '-> BAD')
+            print('#' + str(_counter), '> filename', _filename, '> attemp', _attemp, '-',
+                  'res', _res, '-> BAD')
             return False
 
     elif _algo_name.upper() == "RBF":
         # Todo : Ajout implém RBF
         pass
+
 
 if __name__ == "__main__":
     inputVal = input("Dataset à tester : ")

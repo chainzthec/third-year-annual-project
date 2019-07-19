@@ -109,8 +109,7 @@ def launchTraitement(_XTrain, _YTrain, _algo_name, _size):
                 _yTrainFinal.append(_attemp)
 
             elif algo_name == "RBF":
-                # Todo : Ajout implém RBF
-                pass
+                _yTrainFinal += _YTrain[i]
 
             if i % _XTrain_size_percent == 0:
                 print("- Conversion : " + str(i) + '/' + str(_XTrain_size) + " images")
@@ -183,7 +182,8 @@ if __name__ == "__main__":
         Utils.save(linearClassif, 'LINEAR', 'classification_E'+str(epochs)+'_A'+str(alpha))
 
     elif algo_name == "RBF":
-        pass
+        rbfClassif = RBF.naive_rbf_train(xTrain, yTrain, inputCountPerSample, sampleCount, gamma)
+        Utils.save(rbfClassif, 'RBF', 'classification_E' + str(epochs) + '_A' + str(alpha) + '_G' + str(gamma))
 
     end_time = time.time()
 

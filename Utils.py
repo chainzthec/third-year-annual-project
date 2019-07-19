@@ -4,7 +4,7 @@ import sys
 
 import Implementation.MLP.MLP as MLP
 import Implementation.Linear.Linear as Linear
-# import Implementation.RBF.RBF as RBF
+import Implementation.RBF.RBF as RBF
 
 
 def load(_filename):
@@ -24,8 +24,7 @@ def load(_filename):
         value = Linear.create(content)
 
     elif algo_name == "RBF":
-        # Todo : Ajout implém RBF
-        pass
+        value = RBF.create(content)
 
     return value, algo_name
 
@@ -38,8 +37,7 @@ def predict(model, algo_name, XToPredict):
         return Linear.predict_classification(model, XToPredict)
 
     elif algo_name.upper() == "RBF":
-        # Todo : Ajout implém RBF
-        pass
+        return RBF.naive_rbf_classification_predict(model, XToPredict)
 
 
 def save(model, algo_name, _filename):
@@ -52,8 +50,7 @@ def save(model, algo_name, _filename):
         value = Linear.export(model)
 
     elif algo_name.upper() == "RBF":
-        # Todo : Ajout implém RBF
-        # value = RBF.export(model)
+        value = RBF.export(model)
         pass
 
     json_val = json.dumps(value)

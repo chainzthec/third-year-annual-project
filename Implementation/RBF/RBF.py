@@ -2,9 +2,10 @@
 # [30/06/2019] Created by Théo Huchard
 #
 
-import json
 import os
 import sys
+import numpy as np
+import pprint
 from ctypes import *
 
 
@@ -120,6 +121,8 @@ def export(rbf):
     for i in range(WSize):
         WValuesArray.append(WValues[i])
 
+    print(WValuesArray)
+
     return {"W": WValuesArray, 'gamma': Gamma, 'type': 'rbf'}
 
 
@@ -136,3 +139,4 @@ def create(content):
 
     myDll.create.restype = c_void_p
     return myDll.create(WPointer, WSize)
+
