@@ -9,6 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(__file__, "../../..")))
 import Utils
 import Implementation.MLP.MLP as MLP
 import Implementation.Linear.Linear as Linear
+import Implementation.RBF.RBF as RBF
 
 
 def launch_traitment(image, model_name):
@@ -57,6 +58,9 @@ def launch_traitment(image, model_name):
             classe = "France"
         else:
             classe = "Italie"
+
+    elif algo_name.upper() == "RBF":
+        pass
 
     return {"res": True, 'result': res, 'classe': classe}
 

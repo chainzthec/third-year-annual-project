@@ -21,19 +21,12 @@ Lien vers le rapport (Google Doc) : [Rapport Projet Annuel](https://docs.google.
 
 ### Compiler la/les librairie(s)
 
-Il faut tout d'abord se placer dans le répertoire du fichier .cpp que l'on souhaite compiler
+Il faut tout d'abord se placer dans le répertoire du projet
 
 ```bash
-cd ProjetAnnuel/Implementation/Linear/
+cd ProjetAnnuel/
 ```
 
-```bash
-cd ProjetAnnuel/Implementation/MLP/
-```
-
-```bash
-cd ProjetAnnuel/Implementation/RBF/
-```
 
 puis pour compiler le fichier .cpp avec ses dépendances :
 
@@ -42,21 +35,21 @@ puis pour compiler le fichier .cpp avec ses dépendances :
 * Windows : 
 
 ```bash
-g++ -c Linear.cpp && g++ -shared -o Linear.dll Linear.o -W
+g++ -c Implementation/Linear/Linear.cpp && g++ -shared -o Librairie/Windows/Implementation/Linear/Linear.dll Librairie/Windows/Implementation/Linear/Linear.o -W
 ```
 
 * Mac : 
 
 ```bash
-g++ -c -std=c++17 Linear.cpp -o Librairie/Mac/Linear_Mac.o && 
-g++ -shared -Wl -o Librairie/Mac/Linear_Mac.so Librairie/Mac/Linear_Mac.o
+g++ -c -std=c++17 Implementation/Linear/Linear.cpp -o Implementation/Linear/Librairie/Mac/Linear_Mac.o && 
+g++ -shared -Wl -o Implementation/Linear/Librairie/Mac/Linear_Mac.so Implementation/Linear/Librairie/Mac/Linear_Mac.o
 ```
 
 * Linux : 
 
 ```bash
-g++ -c -std=c++17 Linear.cpp -o Librairie/Linux/Linear_Linux.o && 
-g++ -shared -Wl -o Librairie/Linux/Linear_Linux.so Librairie/Linux/Linear_Linux.o
+g++ -c -std=c++17 Implementation/Linear/Linear.cpp -o Implementation/Linear/Librairie/Linux/Linear_Linux.o && 
+g++ -shared -Wl -o Implementation/Linear/Librairie/Linux/Linear_Linux.so Implementation/Linear/Librairie/Linux/Linear_Linux.o
 ```
 
 #### MLP : 
@@ -64,21 +57,21 @@ g++ -shared -Wl -o Librairie/Linux/Linear_Linux.so Librairie/Linux/Linear_Linux.
 * Windows : 
 
 ```bash
-g++ -c MLP.cpp && g++ -shared -o Librairie/Windows/MLP_Windows.dll Librairie/Windows/MLP_Windows.o -W
+g++ -c Implementation/MLP/MLP.cpp && g++ -shared -o Librairie/Windows/Implementation/MLP/MLP.dll Librairie/Windows/Implementation/MLP/MLP.o -W
 ```
 
-* Mac :  
+* Mac : 
 
 ```bash
-g++ -c -std=c++17 MLP.cpp -o Librairie/Mac/MLP_Mac.o && 
-g++ -shared -Wl -o Librairie/Mac/MLP_Mac.so Librairie/Mac/MLP_Mac.o
+g++ -c -std=c++17 Implementation/MLP/MLP.cpp -o Implementation/MLP/Librairie/Mac/MLP_Mac.o && 
+g++ -shared -Wl -o Implementation/MLP/Librairie/Mac/MLP_Mac.so Implementation/MLP/Librairie/Mac/MLP_Mac.o
 ```
 
-* Linux :  
+* Linux : 
 
 ```bash
-g++ -c -std=c++17 MLP.cpp -o Librairie/Linux/MLP_Linux.o && 
-g++ -shared -Wl -o Librairie/Linux/MLP_Linux.so Librairie/Linux/MLP_Linux.o
+g++ -c -std=c++17 Implementation/MLP/MLP.cpp -o Implementation/MLP/Librairie/Linux/MLP_Linux.o && 
+g++ -shared -Wl -o Implementation/MLP/Librairie/Linux/MLP_Linux.so Implementation/MLP/Librairie/Linux/MLP_Linux.o
 ```
 
 #### RBF : 
@@ -86,21 +79,21 @@ g++ -shared -Wl -o Librairie/Linux/MLP_Linux.so Librairie/Linux/MLP_Linux.o
 * Windows : 
 
 ```bash
-g++ -c RBF.cpp && g++ -shared -o Librairie/Windows/RBF_Windows.dll Librairie/Windows/RBF_Windows.o -W
+g++ -c Implementation/RBF/RBF.cpp && g++ -shared -o Librairie/Windows/Implementation/RBF/RBF.dll Librairie/Windows/Implementation/RBF/RBF.o -W
 ```
 
-* Mac :  
+* Mac : 
 
 ```bash
-g++ -c -std=c++17 RBF.cpp -o Librairie/Mac/RBF_Mac.o && 
-g++ -shared -Wl -o Librairie/Mac/RBF_Mac.so Librairie/Mac/RBF_Mac.o
+g++ -c -std=c++17 Implementation/RBF/RBF.cpp -o Implementation/RBF/Librairie/Mac/RBF_Mac.o && 
+g++ -shared -Wl -o Implementation/RBF/Librairie/Mac/RBF_Mac.so Implementation/RBF/Librairie/Mac/RBF_Mac.o
 ```
 
-* Linux :  
+* Linux : 
 
 ```bash
-g++ -c -std=c++17 RBF.cpp -o Librairie/Linux/RBF_Linux.o && 
-g++ -shared -Wl -o Librairie/Linux/RBF_Linux.so Librairie/Linux/RBF_Linux.o
+g++ -c -std=c++17 Implementation/RBF/RBF.cpp -o Implementation/RBF/Librairie/Linux/RBF_Linux.o && 
+g++ -shared -Wl -o Implementation/RBF/Librairie/Linux/RBF_Linux.so Implementation/RBF/Librairie/Linux/RBF_Linux.o
 ```
 
 #### Librairie C + Python 
