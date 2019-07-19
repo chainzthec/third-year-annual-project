@@ -50,8 +50,6 @@ def launch_traitment(image, model_name):
             classe = "France"
         elif maxindex == 1:
             classe = "Italie"
-        elif maxindex == 2:
-            classe = "Congo"
 
     elif algo_name.upper() == "LINEAR":
         if res < 0:
@@ -60,7 +58,10 @@ def launch_traitment(image, model_name):
             classe = "Italie"
 
     elif algo_name.upper() == "RBF":
-        pass
+        if res < 0:
+            classe = "France"
+        else:
+            classe = "Italie"
 
     return {"res": True, 'result': res, 'classe': classe}
 
